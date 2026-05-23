@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useGameStore } from '../store/gameStore.js'
+import fondoLobby from '../assets/lobby.png'
 
 /**
  * Pantalla de lobby: bono inicial $20 a Fuego y acceso al nivel 1.
@@ -9,11 +10,23 @@ export default function Lobby() {
 
   return (
     <motion.div
-      className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-b from-[#1a0f2e] via-[#2d1b4e] to-[#1a0f2e] p-8 text-center"
+      className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden p-8 text-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <img
+        src={fondoLobby}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/55"
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 flex flex-col items-center">
       <motion.div
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -55,6 +68,7 @@ export default function Lobby() {
       <p className="mt-8 text-xs text-white/40">
         🔥 Flechas · 💧 WASD
       </p>
+      </div>
     </motion.div>
   )
 }
