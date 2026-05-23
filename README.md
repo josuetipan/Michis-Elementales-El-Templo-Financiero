@@ -14,14 +14,16 @@ Juego de plataformas cooperativo educativo (estilo Fireboy & Watergirl) con mec�
 
 ## Comandos
 
-```bash
-# Desde la raíz del repo
-npm install
-cd client && npm install
+Requisito: [pnpm](https://pnpm.io) (v11+). Si usas Node 16+, puedes activarlo con `corepack enable`.
 
-npm run dev          # http://localhost:5173
-npm run build
-npm run preview
+```bash
+# Desde la raíz del repo (instala el workspace, incluido client/)
+pnpm install
+
+pnpm dev             # http://localhost:5173
+pnpm build
+pnpm preview
+pnpm lint
 ```
 
 ## Estructura
