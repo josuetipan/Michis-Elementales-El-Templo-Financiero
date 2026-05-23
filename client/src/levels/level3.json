@@ -1,0 +1,27 @@
+{
+  "id": 3,
+  "nombre": "Templo del Balance",
+  "worldWidth": 2000,
+  "worldHeight": 720,
+  "spawn": {
+    "fuego": { "x": 80, "y": 580 },
+    "gota": { "x": 160, "y": 580 }
+  },
+  "platforms": [
+    { "x": 0, "y": 640, "width": 2000, "height": 80, "type": "platform" },
+    { "x": 300, "y": 500, "width": 120, "height": 24, "type": "platform" },
+    { "x": 600, "y": 400, "width": 120, "height": 24, "type": "platform" },
+    { "x": 900, "y": 300, "width": 120, "height": 24, "type": "platform" }
+  ],
+  "coins": [
+    { "x": 330, "y": 460, "width": 28, "height": 28, "type": "fuego", "value": 100 },
+    { "x": 930, "y": 260, "width": 28, "height": 28, "type": "gota", "value": 100 }
+  ],
+  "hazards": [
+    { "x": 500, "y": 610, "width": 80, "height": 32, "type": "gasto_hormiga" }
+  ],
+  "doors": [
+    { "x": 1920, "y": 560, "width": 48, "height": 80, "peaje": 100 }
+  ],
+  "puzzles": []
+}

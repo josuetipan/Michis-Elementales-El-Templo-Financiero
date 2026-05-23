@@ -1,43 +1,51 @@
-# Michis Elementales — El Templo Financiero
+# Gatos Financieros: El Templo del Balance
 
-Aplicación web en **React** + **Vite** para gestionar un tesoro simbólico con la temática de gatos elementales guardianes de las finanzas.
+Juego de plataformas cooperativo educativo (estilo Fireboy & Watergirl) con mecánicas de finanzas personales integradas de forma invisible.
 
-## Requisitos
+## Stack (fase actual — cliente)
 
-- Node.js 18+
-- npm
+- **React 18+** + **Vite** — shell, HUD, lobby
+- **Canvas API** + **Matter.js** — bucle de juego y física
+- **PixiJS** — capa de sprites y partículas
+- **Howler.js** — audio (assets en `client/public/audio/`)
+- **Zustand** — estado global
+- **Tailwind CSS** — UI fuera del canvas
+- **Framer Motion** / **React Spring** — animaciones de pantallas y contadores
 
 ## Comandos
 
 ```bash
-# Instalar dependencias (si aún no lo hiciste)
+# Desde la raíz del repo
 npm install
+cd client && npm install
 
-# Servidor de desarrollo
-npm run dev
-
-# Build de producción
+npm run dev          # http://localhost:5173
 npm run build
-
-# Vista previa del build
 npm run preview
-
-# Linter
-npm run lint
 ```
 
 ## Estructura
 
 ```
-src/
-  App.jsx      # Pantalla principal del templo
-  App.css      # Estilos del templo
-  index.css    # Variables y estilos globales
-  main.jsx     # Punto de entrada React
+client/src/
+  game/           gameLoop.js, physics.js, pixiLayer.js
+  entities/       Cat, Coin, Hazard, Platform, Door
+  levels/         level1.json … level3.json
+  components/     GameCanvas, HUD, Lobby, VictoryScreen
+  store/          gameStore.js, playerStore.js
+  audio/          sounds.js
 ```
 
-## Próximos pasos sugeridos
+## Controles
 
-- Persistir el tesoro en `localStorage`
-- Rutas con React Router (pantallas por michi elemental)
-- Gráficas de gastos e ingresos
+| Gato | Mover | Saltar |
+|------|-------|--------|
+| Fuego 🔥 | ← → | ↑ |
+| Gota 💧 | A D | W |
+
+## Próximos pasos
+
+- Backend Express + Prisma (`/server`)
+- Rompecabezas cooperativos (botón Presupuesto, palanca Fondo de Emergencia)
+- Sprites PNG y música en `/public`
+- Persistencia `POST/GET /api/progress`

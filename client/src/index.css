@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+/* Variables del templo — paleta fuego / gota */
+:root {
+  --fuego: #e85d04;
+  --fuego-claro: #f48c06;
+  --gota: #0077b6;
+  --gota-claro: #00b4d8;
+  --templo-oscuro: #1a0f2e;
+  --templo-medio: #2d1b4e;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: var(--templo-oscuro);
+  color: #f8f4ff;
+}
+
+/* Canvas a pantalla completa; HUD en capa superior */
+.game-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-shell__canvas-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.game-shell__canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-shell__pixi {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.game-shell__hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.game-shell__hud > * {
+  pointer-events: auto;
+}
