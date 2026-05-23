@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
-    "dev": "npm run dev --prefix client",
-    "build": "npm run build --prefix client",
-    "lint": "npm run lint --prefix client",
-    "preview": "npm run preview --prefix client",
-    "dev:client": "npm run dev --prefix client"
+    "dev": "pnpm --filter client dev",
+    "build": "pnpm --filter client build",
+    "lint": "pnpm --filter client lint",
+    "preview": "pnpm --filter client preview",
+    "dev:client": "pnpm --filter client dev"
   },
   "dependencies": {
     "react": "^19.2.6",
