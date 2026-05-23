@@ -1,0 +1,62 @@
+:root {
+  --oro: #e8c547;
+  --oro-claro: #f5e6a8;
+  --purpura: #4a2c6e;
+  --purpura-oscuro: #1a0f2e;
+  --agua: #3d9be9;
+  --fuego: #e85d4c;
+  --tierra: #8b6f47;
+  --aire: #7ec8e3;
+  --texto: #e8e0f0;
+  --texto-suave: #a89bb8;
+  --superficie: rgba(255, 255, 255, 0.06);
+  --borde: rgba(232, 197, 71, 0.25);
+  --sombra: 0 12px 40px rgba(0, 0, 0, 0.45);
+
+  font-family: 'Outfit', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--texto);
+  background-color: var(--purpura-oscuro);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74, 44, 110, 0.9), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(232, 197, 71, 0.08), transparent),
+    linear-gradient(180deg, #120a22 0%, var(--purpura-oscuro) 40%, #0d0618 100%);
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  margin: 0;
+  color: var(--oro-claro);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+}
