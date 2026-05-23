@@ -1,41 +1,41 @@
 {
   "id": 1,
   "nombre": "Puerta del Presupuesto",
-  "worldWidth": 1600,
+  "worldWidth": 1280,
   "worldHeight": 720,
   "spawn": {
-    "fuego": { "x": 120, "y": 580 },
-    "gota": { "x": 200, "y": 580 }
+    "fuego": { "x": 80, "y": 580 },
+    "gota": { "x": 160, "y": 580 }
   },
   "platforms": [
-    { "x": 0, "y": 640, "width": 1600, "height": 80, "type": "platform" },
-    { "x": 280, "y": 520, "width": 220, "height": 24, "type": "platform" },
-    { "x": 620, "y": 420, "width": 180, "height": 24, "type": "platform" },
-    { "x": 900, "y": 520, "width": 200, "height": 24, "type": "platform" },
-    { "x": 480, "y": 380, "width": 40, "height": 120, "type": "barrera" }
+    { "x": 0, "y": 640, "width": 1280, "height": 80, "type": "platform" },
+    { "x": 180, "y": 520, "width": 200, "height": 24, "type": "platform" },
+    { "x": 460, "y": 420, "width": 160, "height": 24, "type": "platform" },
+    { "x": 700, "y": 520, "width": 200, "height": 24, "type": "platform" },
+    { "x": 380, "y": 380, "width": 40, "height": 120, "type": "barrera" }
   ],
   "coins": [
-    { "x": 340, "y": 480, "width": 28, "height": 28, "type": "fuego", "value": 30 },
-    { "x": 680, "y": 380, "width": 28, "height": 28, "type": "gota", "value": 30 }
+    { "x": 240, "y": 480, "width": 28, "height": 28, "type": "fuego", "value": 30 },
+    { "x": 520, "y": 380, "width": 28, "height": 28, "type": "gota", "value": 30 }
   ],
   "hazards": [
-    { "x": 520, "y": 610, "width": 100, "height": 32, "type": "deuda_toxica" },
-    { "x": 750, "y": 610, "width": 100, "height": 32, "type": "inflacion" },
-    { "x": 1100, "y": 610, "width": 120, "height": 32, "type": "gasto_hormiga" }
+    { "x": 420, "y": 610, "width": 90, "height": 32, "type": "deuda_toxica" },
+    { "x": 600, "y": 610, "width": 90, "height": 32, "type": "inflacion" },
+    { "x": 860, "y": 610, "width": 100, "height": 32, "type": "gasto_hormiga" }
   ],
   "doors": [
-    { "x": 1480, "y": 560, "width": 48, "height": 80, "peaje": 20 }
+    { "x": 1180, "y": 560, "width": 48, "height": 80, "peaje": 20 }
   ],
   "puzzles": [
     {
       "id": "presupuesto",
       "type": "boton",
-      "x": 320,
+      "x": 280,
       "y": 600,
       "width": 48,
       "height": 24,
       "activador": "fuego",
-      "objetivo": "barrera-480"
+      "objetivo": "barrera-380"
     }
   ]
 }

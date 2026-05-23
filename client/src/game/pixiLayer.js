@@ -92,7 +92,7 @@ export class PixiLayer {
   /**
    * Posición y textura según estado de animación del Cat.
    */
-  actualizarGato(id, { x, y, estado, facing, tipo }) {
+  actualizarGato(id, { x, y, estado, facing, tipo, escala = 1 }) {
     const datos = this.spritesGatos[id]
     if (!datos) return
 
@@ -110,9 +110,9 @@ export class PixiLayer {
       }
     }
 
-    const escala = ALTURA_SPRITE / (sprite.texture.height || ALTURA_SPRITE)
-    sprite.scale.x = escala * (facing < 0 ? -1 : 1)
-    sprite.scale.y = escala
+    const escalaSprite = (ALTURA_SPRITE / (sprite.texture.height || ALTURA_SPRITE)) * escala
+    sprite.scale.x = escalaSprite * (facing < 0 ? -1 : 1)
+    sprite.scale.y = escalaSprite
   }
 
   emitirParticulasMoneda(x, y, color = 0xfbbf24) {

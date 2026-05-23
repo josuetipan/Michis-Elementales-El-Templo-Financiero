@@ -1,5 +1,5 @@
 import Matter from 'matter-js'
-import { crearMotorFisica, rectsColisionan } from './physics.js'
+import { crearMotorFisica, rectsColisionan, crearPlataforma } from './physics.js'
 import { PixiLayer } from './pixiLayer.js'
 import { Cat } from '../entities/Cat.js'
 import { Platform } from '../entities/Platform.js'
@@ -36,7 +36,46 @@ export class GameLoop {
     this.ultimoTiempo = 0
 
     this.pixi = new PixiLayer(pixiContainer)
-    this.camara = { x: 0, y: 0 }
+    this.mundoAncho = 1280
+    this.mundoAlto = 720
+    this.escala = 1
+    this.offsetX = 0
+    this.offsetY = 0
+  }
+
+  /** Muros invisibles para que nada salga del recuadro del nivel */
+  _crearLimitesMundo(world, ancho, alto) {
+    const grosor = 40
+    const muros = [
+      { x: -grosor / 2, y: alto / 2, w: grosor, h: alto },
+      { x: ancho + grosor / 2, y: alto / 2, w: grosor, h: alto },
+      { x: ancho / 2, y: -grosor / 2, w: ancho, h: grosor },
+    ]
+    for (const { x, y, w, h } of muros) {
+      crearPlataforma(world, {
+        x: x - w / 2,
+        y: y - h / 2,
+        width: w,
+        height: h,
+      })
+    }
+  }
+
+  /** Convierte coordenadas del mundo (1280×720) a pantalla */
+  mundoAPantalla(x, y) {
+    return {
+      x: x * this.escala + this.offsetX,
+      y: y * this.escala + this.offsetY,
+    }
+  }
+
+  /** Escala el mapa entero para que quepa en una sola pantalla (sin scroll) */
+  _calcularVista() {
+    const escalaX = this.anchoVista / this.mundoAncho
+    const escalaY = this.altoVista / this.mundoAlto
+    this.escala = Math.min(escalaX, escalaY)
+    this.offsetX = (this.anchoVista - this.mundoAncho * this.escala) / 2
+    this.offsetY = (this.altoVista - this.mundoAlto * this.escala) / 2
   }
 
   async iniciar() {
@@ -54,6 +93,11 @@ export class GameLoop {
     this.monedas = (nivel.coins || []).map((c) => new Coin(c))
     this.hazards = (nivel.hazards || []).map((h) => new Hazard(h))
     this.puertas = (nivel.doors || []).map((d) => new Door(d))
+
+    this.mundoAncho = nivel.worldWidth || 1280
+    this.mundoAlto = nivel.worldHeight || 720
+    this._calcularVista()
+    this._crearLimitesMundo(world, this.mundoAncho, this.mundoAlto)
 
     const spawn = nivel.spawn || {
       fuego: { x: 100, y: 400 },
@@ -116,6 +160,7 @@ export class GameLoop {
     this.canvas.height = h
     this.anchoVista = w
     this.altoVista = h
+    this._calcularVista()
     this.pixi.redimensionar(w, h)
   }
 
@@ -142,49 +187,35 @@ export class GameLoop {
     this.gatoFuego.actualizar(teclas)
     this.gatoGota.actualizar(teclas)
 
-    this.actualizarCamara()
     this.verificarMonedas()
     this.verificarHazards()
     this.verificarPuertas()
 
-    const pxF = this.gatoFuego.body.position.x - this.camara.x
-    const pyF = this.gatoFuego.body.position.y - this.camara.y + 26
-    const pxG = this.gatoGota.body.position.x - this.camara.x
-    const pyG = this.gatoGota.body.position.y - this.camara.y + 26
+    const posF = this.mundoAPantalla(
+      this.gatoFuego.body.position.x,
+      this.gatoFuego.body.position.y + 26,
+    )
+    const posG = this.mundoAPantalla(
+      this.gatoGota.body.position.x,
+      this.gatoGota.body.position.y + 26,
+    )
 
     this.pixi.actualizarGato('fuego', {
-      x: pxF,
-      y: pyF,
+      x: posF.x,
+      y: posF.y,
       estado: this.gatoFuego.estadoAnim,
       facing: this.gatoFuego.facing,
       tipo: 'fuego',
+      escala: this.escala,
     })
     this.pixi.actualizarGato('gota', {
-      x: pxG,
-      y: pyG,
+      x: posG.x,
+      y: posG.y,
       estado: this.gatoGota.estadoAnim,
       facing: this.gatoGota.facing,
       tipo: 'gota',
+      escala: this.escala,
     })
-  }
-
-  /** Cámara centrada entre ambos gatos */
-  actualizarCamara() {
-    const mx =
-      (this.gatoFuego.body.position.x + this.gatoGota.body.position.x) / 2
-    const my =
-      (this.gatoFuego.body.position.y + this.gatoGota.body.position.y) / 2
-    const mundoW = this.nivel.worldWidth || 1280
-    const mundoH = this.nivel.worldHeight || 720
-
-    this.camara.x = Math.max(
-      0,
-      Math.min(mx - this.anchoVista / 2, mundoW - this.anchoVista),
-    )
-    this.camara.y = Math.max(
-      0,
-      Math.min(my - this.altoVista / 2, mundoH - this.altoVista),
-    )
   }
 
   verificarMonedas() {
@@ -202,11 +233,12 @@ export class GameLoop {
         if (rectsColisionan(cat.getBounds(), moneda.getBounds())) {
           moneda.recogida = true
           reproducir('moneda')
-          const cx = moneda.x + moneda.width / 2 - this.camara.x
-          const cy = moneda.y + moneda.height / 2 - this.camara.y
+          const cx = moneda.x + moneda.width / 2
+          const cy = moneda.y + moneda.height / 2
+          const pantalla = this.mundoAPantalla(cx, cy)
           this.pixi.emitirParticulasMoneda(
-            cx,
-            cy,
+            pantalla.x,
+            pantalla.y,
             moneda.type === 'fuego' ? 0xfbbf24 : 0x7dd3fc,
           )
           this.onMoneda?.(moneda.type, moneda.value)
@@ -243,27 +275,34 @@ export class GameLoop {
 
   renderizar() {
     const ctx = this.ctx
-    const { camara, anchoVista, altoVista, nivel } = this
+    const { anchoVista, altoVista, mundoAncho, mundoAlto } = this
 
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.fillStyle = '#1a0f2e'
     ctx.fillRect(0, 0, anchoVista, altoVista)
 
-    ctx.save()
-    ctx.translate(-camara.x, -camara.y)
+    ctx.setTransform(
+      this.escala,
+      0,
+      0,
+      this.escala,
+      this.offsetX,
+      this.offsetY,
+    )
 
     ctx.fillStyle = '#2d1b4e'
-    ctx.fillRect(
-      0,
-      0,
-      nivel.worldWidth || 1280,
-      nivel.worldHeight || 720,
-    )
+    ctx.fillRect(0, 0, mundoAncho, mundoAlto)
+
+    // Borde del recuadro de juego
+    ctx.strokeStyle = '#6b5b95'
+    ctx.lineWidth = 3
+    ctx.strokeRect(0, 0, mundoAncho, mundoAlto)
 
     for (const p of this.plataformas) p.dibujar(ctx)
     for (const h of this.hazards) h.dibujar(ctx)
     for (const m of this.monedas) m.dibujar(ctx)
     for (const d of this.puertas) d.dibujar(ctx)
 
-    ctx.restore()
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }
