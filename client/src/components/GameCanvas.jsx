@@ -65,9 +65,11 @@ export default function GameCanvas() {
       'ArrowLeft',
       'ArrowRight',
       'ArrowUp',
+      'ArrowDown',
       'KeyA',
       'KeyD',
       'KeyW',
+      'KeyS',
     ])
 
     const keyDown = (e) => {

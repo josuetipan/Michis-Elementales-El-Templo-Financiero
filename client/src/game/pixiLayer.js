@@ -1,16 +1,24 @@
-import { Application, Graphics } from 'pixi.js'
+import { Application, Assets, Graphics, Sprite, Texture } from 'pixi.js'
+import {
+  aliasTextura,
+  listarRecursosSprites,
+} from './catSprites.js'
+
+/** Altura visual objetivo del gato en pantalla */
+const ALTURA_SPRITE = 72
 
 /**
- * Capa PixiJS para sprites de gatos y partículas (sincronizada con Matter.js).
+ * Capa PixiJS: sprites animados de gatos y partículas.
  */
 export class PixiLayer {
   constructor(contenedor) {
     this.contenedor = contenedor
     this.app = null
-    /** Referencia directa al HTMLCanvasElement (no usar app.canvas en destroy) */
     this.canvasEl = null
     this.spritesGatos = {}
+    this.texturas = {}
     this.listo = false
+    this.spritesCargados = false
     this._destruido = false
     this._limpiezaHecha = false
   }
@@ -42,21 +50,69 @@ export class PixiLayer {
     this.listo = true
   }
 
-  registrarGato(id, color) {
-    if (!this.app?.stage) return
-    const g = new Graphics()
-    g.roundRect(-18, -26, 36, 52, 8)
-    g.fill(color)
-    this.app.stage.addChild(g)
-    this.spritesGatos[id] = g
+  /** Precarga todas las imágenes de GatoFuego / GatoAgua */
+  async cargarSpritesGatos() {
+    if (!this.app || this.spritesCargados) return
+
+    const recursos = listarRecursosSprites()
+    await Assets.load(recursos.map((r) => ({ alias: r.alias, src: r.src })))
+
+    for (const { alias } of recursos) {
+      this.texturas[alias] = Texture.from(alias)
+    }
+
+    this.spritesCargados = true
   }
 
-  sincronizarGato(id, x, y) {
-    const sprite = this.spritesGatos[id]
-    if (sprite) {
-      sprite.x = x
-      sprite.y = y
+  registrarGato(id, tipo) {
+    if (!this.app?.stage || !this.spritesCargados) return
+
+    const alias = aliasTextura(tipo, 'quieto')
+    const textura = this.texturas[alias]
+    if (!textura) return
+
+    const sprite = new Sprite(textura)
+    sprite.anchor.set(0.5, 1)
+    this._escalarSprite(sprite)
+    this.app.stage.addChild(sprite)
+
+    this.spritesGatos[id] = {
+      sprite,
+      tipo,
+      estadoActual: 'quieto',
     }
+  }
+
+  _escalarSprite(sprite) {
+    const h = sprite.texture.height || ALTURA_SPRITE
+    const escala = ALTURA_SPRITE / h
+    sprite.scale.set(escala)
+  }
+
+  /**
+   * Posición y textura según estado de animación del Cat.
+   */
+  actualizarGato(id, { x, y, estado, facing, tipo }) {
+    const datos = this.spritesGatos[id]
+    if (!datos) return
+
+    const { sprite } = datos
+    sprite.x = x
+    sprite.y = y
+
+    const accion = estado || 'quieto'
+    if (datos.estadoActual !== accion) {
+      const alias = aliasTextura(tipo, accion)
+      const tex = this.texturas[alias]
+      if (tex) {
+        sprite.texture = tex
+        datos.estadoActual = accion
+      }
+    }
+
+    const escala = ALTURA_SPRITE / (sprite.texture.height || ALTURA_SPRITE)
+    sprite.scale.x = escala * (facing < 0 ? -1 : 1)
+    sprite.scale.y = escala
   }
 
   emitirParticulasMoneda(x, y, color = 0xfbbf24) {
@@ -82,10 +138,6 @@ export class PixiLayer {
     }
   }
 
-  /**
-   * Limpieza segura para Strict Mode / desmontaje React.
-   * No usar app.canvas: el getter falla si renderer ya es null.
-   */
   _limpiarApp(app, estabaListo) {
     if (this._limpiezaHecha) return
     this._limpiezaHecha = true
@@ -105,6 +157,9 @@ export class PixiLayer {
     } catch (err) {
       console.warn('[PixiLayer] limpieza parcial:', err)
     }
+
+    this.texturas = {}
+    this.spritesCargados = false
   }
 
   destruir() {

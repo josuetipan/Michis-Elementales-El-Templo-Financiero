@@ -12,7 +12,14 @@ const CONTROLES = {
     izquierda: 'KeyA',
     derecha: 'KeyD',
     salto: 'KeyW',
+    ataque: 'KeyS',
   },
+}
+
+/** Tecla de animación de ataque (lanzar fuego / chorro) */
+const ATAQUE = {
+  fuego: 'ArrowDown',
+  gota: 'KeyS',
 }
 
 /**
@@ -27,8 +34,13 @@ export class Cat {
     this.velocidadX = 5.5
     this.fuerzaSalto = 0.045
     this.enSuelo = false
+    this.estabaEnAire = false
+    this.framesAterrizaje = 0
+    this.estadoAnim = 'quieto'
+    this.facing = 1
     this.color = type === 'fuego' ? '#e85d04' : '#0077b6'
     this.controles = CONTROLES[type]
+    this.teclaAtaque = ATAQUE[type]
 
     this.body = Matter.Bodies.rectangle(x, y, width, height, {
       friction: 0.05,
@@ -61,8 +73,47 @@ export class Cat {
     }
   }
 
-  actualizar() {
+  actualizar(teclas = {}) {
     this.enSuelo = estaEnSuelo(this.body, this.engine)
+    this.actualizarAnimacion(teclas)
+  }
+
+  /**
+   * Elige sprite según física y teclas (quieto, caminar, salto, aterrizaje, lanzar).
+   */
+  actualizarAnimacion(teclas) {
+    const vx = this.body.velocity.x
+    const vy = this.body.velocity.y
+    const c = this.controles
+
+    if (teclas[c.derecha]) this.facing = 1
+    if (teclas[c.izquierda]) this.facing = -1
+
+    if (teclas[this.teclaAtaque] && this.enSuelo) {
+      this.estadoAnim = 'lanzando'
+      return
+    }
+
+    if (!this.enSuelo) {
+      this.estabaEnAire = true
+      if (vy < -0.2) this.estadoAnim = 'salto'
+      else this.estadoAnim = 'aterizaje'
+      return
+    }
+
+    if (this.estabaEnAire) {
+      this.estabaEnAire = false
+      this.framesAterrizaje = 10
+    }
+
+    if (this.framesAterrizaje > 0) {
+      this.framesAterrizaje--
+      this.estadoAnim = 'aterizaje'
+      return
+    }
+
+    if (Math.abs(vx) > 0.25) this.estadoAnim = 'caminando'
+    else this.estadoAnim = 'quieto'
   }
 
   /** Rectángulo para colisiones con monedas y hazards */

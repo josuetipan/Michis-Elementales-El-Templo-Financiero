@@ -76,8 +76,15 @@ export class GameLoop {
       return
     }
 
-    this.pixi.registrarGato('fuego', 0xe85d04)
-    this.pixi.registrarGato('gota', 0x0077b6)
+    await this.pixi.cargarSpritesGatos()
+
+    if (this._detenido) {
+      this.pixi.destruir()
+      return
+    }
+
+    this.pixi.registrarGato('fuego', 'fuego')
+    this.pixi.registrarGato('gota', 'gota')
 
     this._manejarResize = () => this.redimensionar()
     window.addEventListener('resize', this._manejarResize)
@@ -132,24 +139,33 @@ export class GameLoop {
 
     Matter.Engine.update(this.engine, 1000 / 60)
 
-    this.gatoFuego.actualizar()
-    this.gatoGota.actualizar()
+    this.gatoFuego.actualizar(teclas)
+    this.gatoGota.actualizar(teclas)
 
     this.actualizarCamara()
     this.verificarMonedas()
     this.verificarHazards()
     this.verificarPuertas()
 
-    this.pixi.sincronizarGato(
-      'fuego',
-      this.gatoFuego.body.position.x - this.camara.x,
-      this.gatoFuego.body.position.y - this.camara.y,
-    )
-    this.pixi.sincronizarGato(
-      'gota',
-      this.gatoGota.body.position.x - this.camara.x,
-      this.gatoGota.body.position.y - this.camara.y,
-    )
+    const pxF = this.gatoFuego.body.position.x - this.camara.x
+    const pyF = this.gatoFuego.body.position.y - this.camara.y + 26
+    const pxG = this.gatoGota.body.position.x - this.camara.x
+    const pyG = this.gatoGota.body.position.y - this.camara.y + 26
+
+    this.pixi.actualizarGato('fuego', {
+      x: pxF,
+      y: pyF,
+      estado: this.gatoFuego.estadoAnim,
+      facing: this.gatoFuego.facing,
+      tipo: 'fuego',
+    })
+    this.pixi.actualizarGato('gota', {
+      x: pxG,
+      y: pyG,
+      estado: this.gatoGota.estadoAnim,
+      facing: this.gatoGota.facing,
+      tipo: 'gota',
+    })
   }
 
   /** Cámara centrada entre ambos gatos */
@@ -248,20 +264,6 @@ export class GameLoop {
     for (const m of this.monedas) m.dibujar(ctx)
     for (const d of this.puertas) d.dibujar(ctx)
 
-    this.dibujarGato(ctx, this.gatoFuego)
-    this.dibujarGato(ctx, this.gatoGota)
-
     ctx.restore()
-  }
-
-  dibujarGato(ctx, gato) {
-    const b = gato.getBounds()
-    ctx.fillStyle = gato.color
-    ctx.beginPath()
-    ctx.roundRect(b.x, b.y, b.width, b.height, 8)
-    ctx.fill()
-    ctx.fillStyle = '#fff'
-    ctx.font = '20px serif'
-    ctx.fillText(gato.type === 'fuego' ? '🔥' : '💧', b.x + 8, b.y + 32)
   }
 }

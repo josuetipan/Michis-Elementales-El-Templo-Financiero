@@ -53,7 +53,7 @@ export default function Lobby() {
       </motion.button>
 
       <p className="mt-8 text-xs text-white/40">
-        🔥 Flechas · 💧 WASD
+        🔥 Flechas + ↓ ataque · 💧 WASD + S ataque
       </p>
     </motion.div>
   )

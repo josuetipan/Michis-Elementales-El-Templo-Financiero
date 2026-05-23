@@ -90,7 +90,7 @@ export default function HUD() {
       </div>
 
       <p className="text-xs text-white/50">
-        🔥 Flechas · 💧 WASD — cooperad para el equilibrio
+        🔥 Flechas + ↓ ataque · 💧 WASD + S ataque — cooperad para el equilibrio
       </p>
     </header>
   )
