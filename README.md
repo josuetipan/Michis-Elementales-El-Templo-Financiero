@@ -14,14 +14,24 @@ Juego de plataformas cooperativo educativo (estilo Fireboy & Watergirl) con mec�
 
 ## Comandos
 
-```bash
-# Desde la raíz del repo
-npm install
-cd client && npm install
+Requisito: [pnpm](https://pnpm.io) (v11+). Actívalo con `corepack enable` si usas Node 16+.
 
-npm run dev          # http://localhost:5173
-npm run build
-npm run preview
+```bash
+# Desde la raíz del repo (instala todo el workspace)
+pnpm install
+
+pnpm dev             # http://localhost:5173
+pnpm build
+pnpm preview
+pnpm lint
+```
+
+Si ves `EPERM` en Windows, cierra el servidor/IDE que use el proyecto y ejecuta:
+
+```bash
+Remove-Item -Recurse -Force node_modules, client\node_modules -ErrorAction SilentlyContinue
+pnpm install
+pnpm dev
 ```
 
 ## Estructura
