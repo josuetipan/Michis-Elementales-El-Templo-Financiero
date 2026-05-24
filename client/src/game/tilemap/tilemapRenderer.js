@@ -11,12 +11,14 @@ export function renderizarTilemap(ctx, grid, opciones = {}) {
     offsetX = 0,
     offsetY = 0,
     mostrarBordes = false,
+    omitirSuelo = false,
   } = opciones
 
   for (let fila = 0; fila < grid.length; fila++) {
     for (let col = 0; col < grid[fila].length; col++) {
       const celda = normalizarCelda(grid[fila][col])
       if (celda === TILE.VACIO) continue
+      if (omitirSuelo && celda === TILE.SUELO) continue
 
       const x = offsetX + col * tileSize
       const y = offsetY + fila * tileSize

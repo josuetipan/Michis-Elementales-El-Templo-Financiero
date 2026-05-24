@@ -7,6 +7,7 @@ import { SpriteAtlas } from '../sprites/spriteAtlas.js'
 import { GatoSpriteLoader } from '../sprites/gatoSpriteLoader.js'
 import { Coin } from '../../entities/Coin.js'
 import { reproducir } from '../../audio/sounds.js'
+import { FONDO_MAPA_URL, cargarImagen, dibujarFondoMapa } from '../mapAssets.js'
 
 /**
  * Motor del juego: tilemap, física, sprites PNG animados y pantalla completa fija.
@@ -22,7 +23,9 @@ export class GameEngine {
     this.atlasUrl = opciones.atlasUrl ?? null
     this.onHazard = opciones.onHazard
     this.onMoneda = opciones.onMoneda
-    this.colorFondo = opciones.colorFondo ?? '#2d1b4e'
+    this.colorFondo = opciones.colorFondo ?? '#1a0f2e'
+    this.fondoMapaUrl = opciones.fondoMapaUrl ?? FONDO_MAPA_URL
+    this.fondoMapa = null
 
     this.activo = false
     this.rafId = null
@@ -48,7 +51,12 @@ export class GameEngine {
   }
 
   async iniciar() {
-    await Promise.all([this.atlas.cargar(), this.gatoSprites.cargar()])
+    const [fondoMapa] = await Promise.all([
+      cargarImagen(this.fondoMapaUrl),
+      this.atlas.cargar(),
+      this.gatoSprites.cargar(),
+    ])
+    this.fondoMapa = fondoMapa
     this.redimensionar()
 
     const spawnFuego = this.spawn?.fuego ?? { x: 96, y: 96 }
@@ -185,13 +193,17 @@ export class GameEngine {
 
     ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
 
-    ctx.fillStyle = this.colorFondo
-    ctx.fillRect(0, 0, mundo.ancho, mundo.alto)
+    const fondoListo = dibujarFondoMapa(ctx, this.fondoMapa, mundo.ancho, mundo.alto)
+    if (!fondoListo) {
+      ctx.fillStyle = this.colorFondo
+      ctx.fillRect(0, 0, mundo.ancho, mundo.alto)
+    }
 
     renderizarTilemap(ctx, this.grid, {
       tileSize: this.tileSize,
       atlas: this.atlas,
       mostrarBordes: false,
+      omitirSuelo: fondoListo,
     })
 
     ctx.save()
