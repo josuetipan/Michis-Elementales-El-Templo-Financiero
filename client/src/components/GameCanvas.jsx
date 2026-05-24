@@ -14,15 +14,25 @@ export default function GameCanvas() {
 
   const nivelActual = useGameStore((s) => s.nivelActual)
   const perderVida = useGameStore((s) => s.perderVida)
+  const agregarBolsaFuego = useGameStore((s) => s.agregarBolsaFuego)
+  const agregarCofreGota = useGameStore((s) => s.agregarCofreGota)
   const setTecla = usePlayerStore((s) => s.setTecla)
   const limpiarTeclas = usePlayerStore((s) => s.limpiarTeclas)
 
-  const { grid, spawn, tileSize } = obtenerGridNivel(nivelActual)
+  const { grid, spawn, tileSize, monedas } = obtenerGridNivel(nivelActual)
 
   const onHazard = useCallback(() => {
     reproducir('gameOver')
     perderVida()
   }, [perderVida])
+
+  const onMoneda = useCallback(
+    (tipo, valor) => {
+      if (tipo === 'fuego') agregarBolsaFuego(valor)
+      else agregarCofreGota(valor)
+    },
+    [agregarBolsaFuego, agregarCofreGota],
+  )
 
   useEffect(() => {
     const teclasPermitidas = new Set([
@@ -67,8 +77,10 @@ export default function GameCanvas() {
         grid={grid}
         tileSize={tileSize}
         spawn={spawn}
+        monedas={monedas}
         teclasRef={teclasRef}
         onHazard={onHazard}
+        onMoneda={onMoneda}
       />
     </div>
   )

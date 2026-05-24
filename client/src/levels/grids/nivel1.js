@@ -49,3 +49,10 @@ export const SPAWN_NIVEL_1 = {
   fuego: { x: 120, y: 632 },
   gota: { x: 200, y: 632 },
 }
+
+/** Monedas sobre plataformas (fuego / gota según diseño nivel 1) */
+export const MONEDAS_NIVEL_1 = [
+  { x: 9 * 32, y: 15 * 32, width: 26, height: 26, type: 'fuego', value: 30 },
+  { x: 21 * 32, y: 12 * 32, width: 26, height: 26, type: 'gota', value: 30 },
+  { x: 30 * 32, y: 15 * 32, width: 26, height: 26, type: 'fuego', value: 30 },
+]

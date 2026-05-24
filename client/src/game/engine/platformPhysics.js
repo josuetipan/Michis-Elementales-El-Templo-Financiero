@@ -7,9 +7,10 @@ export const FISICA = {
   GRAVITY: 1600,
   VELOCIDAD_MAX_CAIDA: 820,
   VELOCIDAD_MOVIMIENTO: 260,
-  FUERZA_SALTO: -520,
+  FUERZA_SALTO: -780,
   FRICCION_SUELO: 0.78,
   FRICCION_AIRE: 0.92,
+  COYOTE_MS: 120,
 }
 
 /** Dos rectángulos AABB se superponen */
@@ -72,4 +73,33 @@ export function aplicarFriccion(entidad) {
   const factor = entidad.enSuelo ? FISICA.FRICCION_SUELO : FISICA.FRICCION_AIRE
   entidad.vx *= factor
   if (Math.abs(entidad.vx) < 4) entidad.vx = 0
+}
+
+/**
+ * Mantiene al personaje dentro del rectángulo del mundo (una sola pantalla).
+ * Se aplica después de colisiones con plataformas.
+ */
+export function aplicarLimitesMundo(entidad, mundoAncho, mundoAlto) {
+  if (entidad.x < 0) {
+    entidad.x = 0
+    entidad.vx = 0
+  }
+  if (entidad.x + entidad.width > mundoAncho) {
+    entidad.x = mundoAncho - entidad.width
+    entidad.vx = 0
+  }
+  if (entidad.y < 0) {
+    entidad.y = 0
+    entidad.vy = 0
+  }
+  if (entidad.y + entidad.height > mundoAlto) {
+    entidad.y = mundoAlto - entidad.height
+    entidad.vy = 0
+    entidad.enSuelo = true
+  }
+}
+
+/** Techo invisible; los bordes laterales los maneja aplicarLimitesMundo */
+export function crearMurosMundo(mundoAncho, _mundoAlto, grosor = 32) {
+  return [{ x: 0, y: -grosor, width: mundoAncho, height: grosor }]
 }

@@ -1,12 +1,15 @@
 import { parsearGrid, dimensionesDelMapa } from '../tilemap/collisionGrid.js'
 import { renderizarTilemap } from '../tilemap/tilemapRenderer.js'
 import { charcoAfectaATipo } from '../tilemap/constants.js'
-import { rectsColisionan } from './platformPhysics.js'
+import { rectsColisionan, crearMurosMundo } from './platformPhysics.js'
 import { Personaje } from './personaje.js'
 import { SpriteAtlas } from '../sprites/spriteAtlas.js'
+import { GatoSpriteLoader } from '../sprites/gatoSpriteLoader.js'
+import { Coin } from '../../entities/Coin.js'
+import { reproducir } from '../../audio/sounds.js'
 
 /**
- * Motor del juego (sin React): bucle rAF, cámara, colisiones y render.
+ * Motor del juego: tilemap, física, sprites PNG animados y pantalla completa fija.
  */
 export class GameEngine {
   constructor(opciones) {
@@ -18,23 +21,30 @@ export class GameEngine {
     this.teclasRef = opciones.teclasRef
     this.atlasUrl = opciones.atlasUrl ?? null
     this.onHazard = opciones.onHazard
-    this.colorFondo = opciones.colorFondo ?? '#1a0f2e'
+    this.onMoneda = opciones.onMoneda
+    this.colorFondo = opciones.colorFondo ?? '#2d1b4e'
 
     this.activo = false
     this.rafId = null
     this.ultimoTiempo = 0
-    this.camara = { x: 0, y: 0 }
+    this.escalaX = 1
+    this.escalaY = 1
 
     const { solidos, charcos } = parsearGrid(this.grid, this.tileSize)
-    this.solidos = solidos
-    this.charcos = charcos
     this.mundo = dimensionesDelMapa(this.grid, this.tileSize)
+    this.solidos = [
+      ...solidos,
+      ...crearMurosMundo(this.mundo.ancho, this.mundo.alto),
+    ]
+    this.charcos = charcos
+    this.monedas = (opciones.monedas || []).map((m) => new Coin(m))
 
     this.atlas = new SpriteAtlas(this.atlasUrl)
+    this.gatoSprites = new GatoSpriteLoader()
   }
 
   async iniciar() {
-    await this.atlas.cargar()
+    await Promise.all([this.atlas.cargar(), this.gatoSprites.cargar()])
     this.redimensionar()
 
     const spawnFuego = this.spawn?.fuego ?? { x: 96, y: 96 }
@@ -59,6 +69,7 @@ export class GameEngine {
       this._onResize = null
     }
     this.atlas.destruir()
+    this.gatoSprites.destruir()
   }
 
   redimensionar() {
@@ -66,6 +77,13 @@ export class GameEngine {
     this.altoVista = window.innerHeight
     this.canvas.width = this.anchoVista
     this.canvas.height = this.altoVista
+    this._calcularVista()
+  }
+
+  /** Mapa estirado a toda la pantalla, sin scroll */
+  _calcularVista() {
+    this.escalaX = this.anchoVista / this.mundo.ancho
+    this.escalaY = this.altoVista / this.mundo.alto
   }
 
   tick = (tiempo) => {
@@ -86,26 +104,31 @@ export class GameEngine {
     this.fuego.aplicarEntrada(teclas)
     this.gota.aplicarEntrada(teclas)
 
-    this.fuego.actualizar(delta, this.solidos)
-    this.gota.actualizar(delta, this.solidos)
+    this.fuego.actualizar(delta, this.solidos, teclas, this.mundo)
+    this.gota.actualizar(delta, this.solidos, teclas, this.mundo)
 
-    this.actualizarCamara()
+    this.verificarMonedas()
     this.verificarCharcos()
   }
 
-  /** Cámara centrada entre ambos gatos, acotada al tamaño del mapa */
-  actualizarCamara() {
-    const centroX = (this.fuego.x + this.gota.x + this.fuego.ancho) / 2
-    const centroY = (this.fuego.y + this.gota.y + this.fuego.alto) / 2
+  verificarMonedas() {
+    const gatos = [
+      { cat: this.fuego, tipo: 'fuego' },
+      { cat: this.gota, tipo: 'gota' },
+    ]
 
-    this.camara.x = Math.max(
-      0,
-      Math.min(centroX - this.anchoVista / 2, this.mundo.ancho - this.anchoVista),
-    )
-    this.camara.y = Math.max(
-      0,
-      Math.min(centroY - this.altoVista / 2, this.mundo.alto - this.altoVista),
-    )
+    for (const moneda of this.monedas) {
+      if (moneda.recogida) continue
+
+      for (const { cat, tipo } of gatos) {
+        if (moneda.type !== tipo) continue
+        if (!rectsColisionan(cat.getBounds(), moneda.getBounds())) continue
+
+        moneda.recogida = true
+        reproducir('moneda')
+        this.onMoneda?.(moneda.type, moneda.value)
+      }
+    }
   }
 
   verificarCharcos() {
@@ -122,27 +145,31 @@ export class GameEngine {
   }
 
   renderizar() {
-    const { ctx, camara, anchoVista, altoVista, mundo } = this
+    const { ctx, mundo } = this
+
+    ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
 
     ctx.fillStyle = this.colorFondo
-    ctx.fillRect(0, 0, anchoVista, altoVista)
-
-    ctx.save()
-    ctx.translate(-camara.x, -camara.y)
-
-    // Fondo del templo (zona jugable)
-    ctx.fillStyle = '#2d1b4e'
     ctx.fillRect(0, 0, mundo.ancho, mundo.alto)
 
     renderizarTilemap(ctx, this.grid, {
       tileSize: this.tileSize,
       atlas: this.atlas,
-      mostrarBordes: true,
+      mostrarBordes: false,
     })
 
-    this.fuego.dibujar(ctx, this.atlas)
-    this.gota.dibujar(ctx, this.atlas)
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(0, 0, mundo.ancho, mundo.alto)
+    ctx.clip()
+
+    for (const moneda of this.monedas) moneda.dibujar(ctx)
+
+    this.fuego.dibujar(ctx, this.gatoSprites)
+    this.gota.dibujar(ctx, this.gatoSprites)
 
     ctx.restore()
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }

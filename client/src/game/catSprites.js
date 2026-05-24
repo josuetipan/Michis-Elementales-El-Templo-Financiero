@@ -1,8 +1,6 @@
 /**
- * Rutas de sprites por personaje y acción.
- * Nombres de archivo: GatoFuego* / GatoAgua* (gota = agua en assets).
- */
-export const ACCIONES_GATO = [
+ * Rutas de sprites por personaje y acción (sin variantes *Capa*).
+ */export const ACCIONES_GATO = [
   'quieto',
   'caminando',
   'salto',

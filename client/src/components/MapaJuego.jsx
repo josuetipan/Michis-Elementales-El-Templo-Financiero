@@ -16,9 +16,11 @@ export default function MapaJuego({
   grid,
   tileSize = 32,
   spawn,
+  monedas = [],
   atlasUrl = '/sprites/templo-atlas.png',
   teclasRef,
   onHazard,
+  onMoneda,
 }) {
   const canvasRef = useRef(null)
   const motorRef = useRef(null)
@@ -35,9 +37,11 @@ export default function MapaJuego({
         grid,
         tileSize,
         spawn,
+        monedas,
         teclasRef,
         atlasUrl,
         onHazard,
+        onMoneda,
       })
 
       motorRef.current = motor
@@ -59,7 +63,7 @@ export default function MapaJuego({
         motorRef.current = null
       }
     }
-  }, [grid, tileSize, spawn, atlasUrl, teclasRef, onHazard])
+  }, [grid, tileSize, spawn, monedas, atlasUrl, teclasRef, onHazard, onMoneda])
 
   return (
     <canvas
