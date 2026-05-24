@@ -3,14 +3,13 @@ import { renderizarTilemap } from '../tilemap/tilemapRenderer.js'
 import { charcoAfectaATipo } from '../tilemap/constants.js'
 import { rectsColisionan, crearMurosMundo } from './platformPhysics.js'
 import { Personaje } from './personaje.js'
-import { SpriteAtlas } from '../sprites/spriteAtlas.js'
 import { GatoSpriteLoader } from '../sprites/gatoSpriteLoader.js'
 import { Coin } from '../../entities/Coin.js'
 import { reproducir } from '../../audio/sounds.js'
-import { FONDO_MAPA_URL, cargarImagen, dibujarFondoMapa } from '../mapAssets.js'
+import { dibujarFondoTemplo, dibujarZonaSalida, dibujarFlechasGuia, dibujarHazMeta } from '../mapCanvas.js'
 
 /**
- * Motor del juego: tilemap, física, sprites PNG animados y pantalla completa fija.
+ * Motor del juego: tilemap Canvas, física y sprites de gatos.
  */
 export class GameEngine {
   constructor(opciones) {
@@ -20,12 +19,8 @@ export class GameEngine {
     this.tileSize = opciones.tileSize ?? 32
     this.spawn = opciones.spawn
     this.teclasRef = opciones.teclasRef
-    this.atlasUrl = opciones.atlasUrl ?? null
     this.onHazard = opciones.onHazard
     this.onMoneda = opciones.onMoneda
-    this.colorFondo = opciones.colorFondo ?? '#1a0f2e'
-    this.fondoMapaUrl = opciones.fondoMapaUrl ?? FONDO_MAPA_URL
-    this.fondoMapa = null
 
     this.activo = false
     this.rafId = null
@@ -42,21 +37,17 @@ export class GameEngine {
     this.charcos = charcos
     this.monedas = (opciones.monedas || []).map((m) => new Coin(m))
     this.puerta = opciones.puerta ?? null
+    this.plataformas = opciones.plataformas ?? []
+    this.guias = opciones.guias ?? []
     this.onCompletarNivel = opciones.onCompletarNivel
     this.bolsaFuegoRef = opciones.bolsaFuegoRef
     this._puertaActivada = false
 
-    this.atlas = new SpriteAtlas(this.atlasUrl)
     this.gatoSprites = new GatoSpriteLoader()
   }
 
   async iniciar() {
-    const [fondoMapa] = await Promise.all([
-      cargarImagen(this.fondoMapaUrl),
-      this.atlas.cargar(),
-      this.gatoSprites.cargar(),
-    ])
-    this.fondoMapa = fondoMapa
+    await this.gatoSprites.cargar()
     this.redimensionar()
 
     const spawnFuego = this.spawn?.fuego ?? { x: 96, y: 96 }
@@ -80,7 +71,6 @@ export class GameEngine {
       window.removeEventListener('resize', this._onResize)
       this._onResize = null
     }
-    this.atlas.destruir()
     this.gatoSprites.destruir()
   }
 
@@ -92,7 +82,6 @@ export class GameEngine {
     this._calcularVista()
   }
 
-  /** Mapa estirado a toda la pantalla, sin scroll */
   _calcularVista() {
     this.escalaX = this.anchoVista / this.mundo.ancho
     this.escalaY = this.altoVista / this.mundo.alto
@@ -130,29 +119,14 @@ export class GameEngine {
     const bolsa = this.bolsaFuegoRef?.current ?? 0
     if (bolsa < peaje) return
 
-    const enPuerta =
-      rectsColisionan(this.fuego.getBounds(), this.puerta) ||
-      rectsColisionan(this.gota.getBounds(), this.puerta)
+    const fuegoEnPuerta = rectsColisionan(this.fuego.getBounds(), this.puerta)
+    const gotaEnPuerta = rectsColisionan(this.gota.getBounds(), this.puerta)
 
-    if (enPuerta) {
+    if (fuegoEnPuerta && gotaEnPuerta) {
       this._puertaActivada = true
       reproducir('peaje')
       this.onCompletarNivel?.()
     }
-  }
-
-  dibujarPuerta(ctx) {
-    if (!this.puerta) return
-    const { x, y, width, height, peaje } = this.puerta
-    ctx.fillStyle = 'rgba(212, 175, 90, 0.85)'
-    ctx.fillRect(x, y, width, height)
-    ctx.strokeStyle = '#f4d58d'
-    ctx.lineWidth = 2
-    ctx.strokeRect(x, y, width, height)
-    ctx.fillStyle = '#1a0f2e'
-    ctx.font = 'bold 12px Outfit'
-    ctx.textAlign = 'center'
-    ctx.fillText(`Peaje $${peaje}`, x + width / 2, y + height / 2)
   }
 
   verificarMonedas() {
@@ -190,30 +164,29 @@ export class GameEngine {
 
   renderizar() {
     const { ctx, mundo } = this
+    const t = this.ultimoTiempo
 
     ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
 
-    const fondoListo = dibujarFondoMapa(ctx, this.fondoMapa, mundo.ancho, mundo.alto)
-    if (!fondoListo) {
-      ctx.fillStyle = this.colorFondo
-      ctx.fillRect(0, 0, mundo.ancho, mundo.alto)
-    }
+    dibujarFondoTemplo(ctx, mundo.ancho, mundo.alto, t)
+    dibujarHazMeta(ctx, this.puerta, mundo.alto, t)
 
     renderizarTilemap(ctx, this.grid, {
       tileSize: this.tileSize,
-      atlas: this.atlas,
-      mostrarBordes: false,
-      omitirSuelo: fondoListo,
+      tiempo: t,
+      plataformas: this.plataformas,
     })
+
+    dibujarFlechasGuia(ctx, this.guias, t)
 
     ctx.save()
     ctx.beginPath()
     ctx.rect(0, 0, mundo.ancho, mundo.alto)
     ctx.clip()
 
-    for (const moneda of this.monedas) moneda.dibujar(ctx)
+    dibujarZonaSalida(ctx, this.puerta, t)
 
-    this.dibujarPuerta(ctx)
+    for (const moneda of this.monedas) moneda.dibujar(ctx)
 
     this.fuego.dibujar(ctx, this.gatoSprites)
     this.gota.dibujar(ctx, this.gatoSprites)

@@ -50,10 +50,6 @@ export class Coin {
     ctx.strokeStyle = '#fff8e7'
     ctx.lineWidth = 2
     ctx.stroke()
-    ctx.fillStyle = '#1a0f2e'
-    ctx.font = 'bold 10px Outfit'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('$', cx, cy)
+    return
   }
 }

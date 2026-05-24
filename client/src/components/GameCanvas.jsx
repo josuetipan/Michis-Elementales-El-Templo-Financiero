@@ -20,7 +20,8 @@ export default function GameCanvas() {
 
   bolsaRef.current = bolsaFuego
 
-  const { grid, spawn, tileSize, monedas, puerta } = obtenerGridNivel(nivelActual)
+  const { grid, spawn, tileSize, monedas, puerta, plataformas, guias } =
+    obtenerGridNivel(nivelActual)
 
   const onHazard = useCallback(() => {
     reproducir('gameOver')
@@ -84,6 +85,8 @@ export default function GameCanvas() {
         spawn={spawn}
         monedas={monedas}
         puerta={puerta}
+        plataformas={plataformas}
+        guias={guias}
         teclasRef={teclasRef}
         bolsaFuegoRef={bolsaRef}
         onHazard={onHazard}
