@@ -5,21 +5,22 @@ import { useGameStore } from '../store/gameStore.js'
 import { usePlayerStore } from '../store/playerStore.js'
 import { reproducir } from '../audio/sounds.js'
 
-/**
- * Puente entre el store de React y el motor Canvas (MapaJuego).
- * Gestiona teclado, game over por charcos y reintentos desde el lobby.
- */
 export default function GameCanvas() {
   const teclasRef = useRef({})
+  const bolsaRef = useRef(0)
 
   const nivelActual = useGameStore((s) => s.nivelActual)
+  const bolsaFuego = useGameStore((s) => s.bolsaFuego)
   const perderVida = useGameStore((s) => s.perderVida)
   const agregarBolsaFuego = useGameStore((s) => s.agregarBolsaFuego)
   const agregarCofreGota = useGameStore((s) => s.agregarCofreGota)
+  const completarNivelActual = useGameStore((s) => s.completarNivelActual)
   const setTecla = usePlayerStore((s) => s.setTecla)
   const limpiarTeclas = usePlayerStore((s) => s.limpiarTeclas)
 
-  const { grid, spawn, tileSize, monedas } = obtenerGridNivel(nivelActual)
+  bolsaRef.current = bolsaFuego
+
+  const { grid, spawn, tileSize, monedas, puerta } = obtenerGridNivel(nivelActual)
 
   const onHazard = useCallback(() => {
     reproducir('gameOver')
@@ -33,6 +34,10 @@ export default function GameCanvas() {
     },
     [agregarBolsaFuego, agregarCofreGota],
   )
+
+  const onCompletarNivel = useCallback(() => {
+    completarNivelActual()
+  }, [completarNivelActual])
 
   useEffect(() => {
     const teclasPermitidas = new Set([
@@ -78,9 +83,12 @@ export default function GameCanvas() {
         tileSize={tileSize}
         spawn={spawn}
         monedas={monedas}
+        puerta={puerta}
         teclasRef={teclasRef}
+        bolsaFuegoRef={bolsaRef}
         onHazard={onHazard}
         onMoneda={onMoneda}
+        onCompletarNivel={onCompletarNivel}
       />
     </div>
   )

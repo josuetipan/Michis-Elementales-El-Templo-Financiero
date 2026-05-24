@@ -1,26 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { GameEngine } from '../game/engine/gameEngine.js'
 
-/**
- * Componente principal del mapa jugable.
- *
- * @param {Object} props
- * @param {Array<Array<number|string>>} props.grid - Matriz bidimensional del nivel
- * @param {number} [props.tileSize=32] - Tamaño de cada celda en píxeles
- * @param {Object} [props.spawn] - { fuego: {x,y}, gota: {x,y} }
- * @param {string} [props.atlasUrl] - Ruta al sprite sheet (opcional)
- * @param {React.RefObject} [props.teclasRef] - Ref con estado de teclas
- * @param {Function} [props.onHazard] - (tipoGato, tipoCharco) => void
- */
 export default function MapaJuego({
   grid,
   tileSize = 32,
   spawn,
   monedas = [],
+  puerta = null,
   atlasUrl = '/sprites/templo-atlas.png',
   teclasRef,
+  bolsaFuegoRef,
   onHazard,
   onMoneda,
+  onCompletarNivel,
 }) {
   const canvasRef = useRef(null)
   const motorRef = useRef(null)
@@ -38,10 +30,13 @@ export default function MapaJuego({
         tileSize,
         spawn,
         monedas,
+        puerta,
         teclasRef,
+        bolsaFuegoRef,
         atlasUrl,
         onHazard,
         onMoneda,
+        onCompletarNivel,
       })
 
       motorRef.current = motor
@@ -63,7 +58,19 @@ export default function MapaJuego({
         motorRef.current = null
       }
     }
-  }, [grid, tileSize, spawn, monedas, atlasUrl, teclasRef, onHazard, onMoneda])
+  }, [
+    grid,
+    tileSize,
+    spawn,
+    monedas,
+    puerta,
+    atlasUrl,
+    teclasRef,
+    bolsaFuegoRef,
+    onHazard,
+    onMoneda,
+    onCompletarNivel,
+  ])
 
   return (
     <canvas

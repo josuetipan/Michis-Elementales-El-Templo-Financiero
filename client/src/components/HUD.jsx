@@ -49,7 +49,7 @@ export default function HUD() {
           <span className="mr-2 text-xl" aria-hidden="true">
             🔥
           </span>
-          <span className="text-xs text-orange-200/90">Bolsa Fuego</span>
+          <span className="text-xs text-orange-200/90">Bolsa Inversión (Fuego)</span>
           <DineroAnimado
             valor={bolsaFuego}
             className="ml-2 text-xl font-bold text-orange-400"
@@ -60,7 +60,7 @@ export default function HUD() {
           <span className="mr-2 text-xl" aria-hidden="true">
             💧
           </span>
-          <span className="text-xs text-sky-200/90">Cofre Gota</span>
+          <span className="text-xs text-sky-200/90">Cofre Ahorro (Gota)</span>
           <DineroAnimado
             valor={cofreGota}
             className="ml-2 text-xl font-bold text-sky-400"
@@ -70,7 +70,7 @@ export default function HUD() {
 
       <div className="max-w-md rounded-xl border border-white/10 bg-black/45 p-3 backdrop-blur-md">
         <div className="mb-1 flex justify-between text-xs text-violet-200/90">
-          <span>Meta del cofre</span>
+          <span>Meta Súper Capas</span>
           <span>
             ${Math.round(cofreGota)} / ${metaCofre}
           </span>

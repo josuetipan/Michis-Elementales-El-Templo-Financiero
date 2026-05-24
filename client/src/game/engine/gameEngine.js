@@ -38,6 +38,10 @@ export class GameEngine {
     ]
     this.charcos = charcos
     this.monedas = (opciones.monedas || []).map((m) => new Coin(m))
+    this.puerta = opciones.puerta ?? null
+    this.onCompletarNivel = opciones.onCompletarNivel
+    this.bolsaFuegoRef = opciones.bolsaFuegoRef
+    this._puertaActivada = false
 
     this.atlas = new SpriteAtlas(this.atlasUrl)
     this.gatoSprites = new GatoSpriteLoader()
@@ -109,6 +113,38 @@ export class GameEngine {
 
     this.verificarMonedas()
     this.verificarCharcos()
+    this.verificarPuerta()
+  }
+
+  verificarPuerta() {
+    if (!this.puerta || this._puertaActivada) return
+    const peaje = this.puerta.peaje ?? 0
+    const bolsa = this.bolsaFuegoRef?.current ?? 0
+    if (bolsa < peaje) return
+
+    const enPuerta =
+      rectsColisionan(this.fuego.getBounds(), this.puerta) ||
+      rectsColisionan(this.gota.getBounds(), this.puerta)
+
+    if (enPuerta) {
+      this._puertaActivada = true
+      reproducir('peaje')
+      this.onCompletarNivel?.()
+    }
+  }
+
+  dibujarPuerta(ctx) {
+    if (!this.puerta) return
+    const { x, y, width, height, peaje } = this.puerta
+    ctx.fillStyle = 'rgba(212, 175, 90, 0.85)'
+    ctx.fillRect(x, y, width, height)
+    ctx.strokeStyle = '#f4d58d'
+    ctx.lineWidth = 2
+    ctx.strokeRect(x, y, width, height)
+    ctx.fillStyle = '#1a0f2e'
+    ctx.font = 'bold 12px Outfit'
+    ctx.textAlign = 'center'
+    ctx.fillText(`Peaje $${peaje}`, x + width / 2, y + height / 2)
   }
 
   verificarMonedas() {
@@ -164,6 +200,8 @@ export class GameEngine {
     ctx.clip()
 
     for (const moneda of this.monedas) moneda.dibujar(ctx)
+
+    this.dibujarPuerta(ctx)
 
     this.fuego.dibujar(ctx, this.gatoSprites)
     this.gota.dibujar(ctx, this.gatoSprites)
