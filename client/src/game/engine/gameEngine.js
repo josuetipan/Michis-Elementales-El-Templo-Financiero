@@ -24,6 +24,8 @@ export class GameEngine {
     this.rafId = null
     this.ultimoTiempo = 0
     this.camara = { x: 0, y: 0 }
+    this.escalaX = 1
+    this.escalaY = 1
 
     const { solidos, charcos } = parsearGrid(this.grid, this.tileSize)
     this.solidos = solidos
@@ -66,6 +68,7 @@ export class GameEngine {
     this.altoVista = window.innerHeight
     this.canvas.width = this.anchoVista
     this.canvas.height = this.altoVista
+    this.actualizarCamara()
   }
 
   tick = (tiempo) => {
@@ -93,19 +96,19 @@ export class GameEngine {
     this.verificarCharcos()
   }
 
-  /** Cámara centrada entre ambos gatos, acotada al tamaño del mapa */
+  /** Mapa fijo: ocupa toda la pantalla sin scroll */
   actualizarCamara() {
-    const centroX = (this.fuego.x + this.gota.x + this.fuego.ancho) / 2
-    const centroY = (this.fuego.y + this.gota.y + this.fuego.alto) / 2
+    this.camara.x = 0
+    this.camara.y = 0
+    this.escalaX = this.anchoVista / this.mundo.ancho
+    this.escalaY = this.altoVista / this.mundo.alto
+  }
 
-    this.camara.x = Math.max(
-      0,
-      Math.min(centroX - this.anchoVista / 2, this.mundo.ancho - this.anchoVista),
-    )
-    this.camara.y = Math.max(
-      0,
-      Math.min(centroY - this.altoVista / 2, this.mundo.alto - this.altoVista),
-    )
+  mundoAPantalla(x, y) {
+    return {
+      x: x * this.escalaX,
+      y: y * this.escalaY,
+    }
   }
 
   verificarCharcos() {
@@ -122,27 +125,22 @@ export class GameEngine {
   }
 
   renderizar() {
-    const { ctx, camara, anchoVista, altoVista, mundo } = this
+    const { ctx, mundo } = this
 
-    ctx.fillStyle = this.colorFondo
-    ctx.fillRect(0, 0, anchoVista, altoVista)
+    ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
 
-    ctx.save()
-    ctx.translate(-camara.x, -camara.y)
-
-    // Fondo del templo (zona jugable)
     ctx.fillStyle = '#2d1b4e'
     ctx.fillRect(0, 0, mundo.ancho, mundo.alto)
 
     renderizarTilemap(ctx, this.grid, {
       tileSize: this.tileSize,
       atlas: this.atlas,
-      mostrarBordes: true,
+      mostrarBordes: false,
     })
 
     this.fuego.dibujar(ctx, this.atlas)
     this.gota.dibujar(ctx, this.atlas)
 
-    ctx.restore()
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }

@@ -1,10 +1,9 @@
-import { Application, Assets, Graphics, Sprite, Texture } from 'pixi.js'
+import { Application, Assets, Graphics, Sprite } from 'pixi.js'
 import {
   aliasTextura,
   listarRecursosSprites,
 } from './catSprites.js'
 
-/** Altura visual objetivo del gato en pantalla */
 const ALTURA_SPRITE = 72
 
 /**
@@ -50,7 +49,6 @@ export class PixiLayer {
     this.listo = true
   }
 
-  /** Precarga todas las imágenes de GatoFuego / GatoAgua */
   async cargarSpritesGatos() {
     if (!this.app || this.spritesCargados) return
 
@@ -58,7 +56,7 @@ export class PixiLayer {
     await Assets.load(recursos.map((r) => ({ alias: r.alias, src: r.src })))
 
     for (const { alias } of recursos) {
-      this.texturas[alias] = Texture.from(alias)
+      this.texturas[alias] = Assets.get(alias)
     }
 
     this.spritesCargados = true
@@ -73,7 +71,6 @@ export class PixiLayer {
 
     const sprite = new Sprite(textura)
     sprite.anchor.set(0.5, 1)
-    this._escalarSprite(sprite)
     this.app.stage.addChild(sprite)
 
     this.spritesGatos[id] = {
@@ -83,15 +80,6 @@ export class PixiLayer {
     }
   }
 
-  _escalarSprite(sprite) {
-    const h = sprite.texture.height || ALTURA_SPRITE
-    const escala = ALTURA_SPRITE / h
-    sprite.scale.set(escala)
-  }
-
-  /**
-   * Posición y textura según estado de animación del Cat.
-   */
   actualizarGato(id, { x, y, estado, facing, tipo, escalaX = 1, escalaY = 1 }) {
     const datos = this.spritesGatos[id]
     if (!datos) return
@@ -150,7 +138,6 @@ export class PixiLayer {
       if (canvas?.parentNode) {
         canvas.parentNode.removeChild(canvas)
       }
-
       if (estabaListo && app?.renderer) {
         app.destroy(true, { children: true })
       }

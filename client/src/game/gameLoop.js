@@ -42,7 +42,6 @@ export class GameLoop {
     this.escalaY = 1
   }
 
-  /** Muros invisibles para que nada salga del recuadro del nivel */
   _crearLimitesMundo(world, ancho, alto) {
     const grosor = 40
     const muros = [
@@ -60,7 +59,6 @@ export class GameLoop {
     }
   }
 
-  /** Convierte coordenadas del mundo a pantalla (toda la ventana es el mapa) */
   mundoAPantalla(x, y) {
     return {
       x: x * this.escalaX,
@@ -68,7 +66,6 @@ export class GameLoop {
     }
   }
 
-  /** El nivel ocupa el 100% del viewport, sin bandas ni recuadro interno */
   _calcularVista() {
     this.escalaX = this.anchoVista / this.mundoAncho
     this.escalaY = this.altoVista / this.mundoAlto
@@ -100,14 +97,8 @@ export class GameLoop {
       gota: { x: 180, y: 400 },
     }
 
-    this.gatoFuego = new Cat(world, engine, {
-      ...spawn.fuego,
-      type: 'fuego',
-    })
-    this.gatoGota = new Cat(world, engine, {
-      ...spawn.gota,
-      type: 'gota',
-    })
+    this.gatoFuego = new Cat(world, engine, { ...spawn.fuego, type: 'fuego' })
+    this.gatoGota = new Cat(world, engine, { ...spawn.gota, type: 'gota' })
 
     await this.pixi.iniciar(this.canvas.width, this.canvas.height)
 
@@ -176,7 +167,7 @@ export class GameLoop {
     const teclas = this.teclasRef.current || {}
 
     this.gatoFuego.aplicarEntrada(teclas)
-    this.gatoGota.aplicarEntrada(teclas)
+    this.gotaGota.aplicarEntrada(teclas)
 
     Matter.Engine.update(this.engine, 1000 / 60)
 
@@ -231,9 +222,10 @@ export class GameLoop {
         if (rectsColisionan(cat.getBounds(), moneda.getBounds())) {
           moneda.recogida = true
           reproducir('moneda')
-          const cx = moneda.x + moneda.width / 2
-          const cy = moneda.y + moneda.height / 2
-          const pantalla = this.mundoAPantalla(cx, cy)
+          const pantalla = this.mundoAPantalla(
+            moneda.x + moneda.width / 2,
+            moneda.y + moneda.height / 2,
+          )
           this.pixi.emitirParticulasMoneda(
             pantalla.x,
             pantalla.y,
@@ -246,10 +238,8 @@ export class GameLoop {
   }
 
   verificarHazards() {
-    const gatos = [this.gatoFuego, this.gatoGota]
-
     for (const hazard of this.hazards) {
-      for (const gato of gatos) {
+      for (const gato of [this.gatoFuego, this.gatoGota]) {
         if (!hazard.afectaATipo(gato.type)) continue
         if (rectsColisionan(gato.getBounds(), hazard.getBounds())) {
           reproducir('gameOver')
@@ -262,11 +252,9 @@ export class GameLoop {
 
   verificarPuertas() {
     for (const puerta of this.puertas) {
-      const boundsF = this.gatoFuego.getBounds()
-      const boundsG = this.gatoGota.getBounds()
       const enPuerta =
-        rectsColisionan(boundsF, puerta.getBounds()) ||
-        rectsColisionan(boundsG, puerta.getBounds())
+        rectsColisionan(this.gatoFuego.getBounds(), puerta.getBounds()) ||
+        rectsColisionan(this.gatoGota.getBounds(), puerta.getBounds())
       if (enPuerta) this.onPuerta?.(puerta)
     }
   }
@@ -276,7 +264,6 @@ export class GameLoop {
     const { mundoAncho, mundoAlto } = this
 
     ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
-
     ctx.fillStyle = '#2d1b4e'
     ctx.fillRect(0, 0, mundoAncho, mundoAlto)
 

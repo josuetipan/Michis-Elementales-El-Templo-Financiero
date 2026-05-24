@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import { useGameStore } from '../store/gameStore.js'
-import fondoLobby from '../assets/lobby.png'
-import imgIngreso from '../assets/ingreso.png'
 import './Lobby.css'
 
+const FONDO_LOBBY = '/assets/Image/lobby.png'
+
 /**
- * Lobby del templo: título, pedestales para gatos, controles y botón de ingreso.
+ * Lobby del templo: fondo ilustrado, controles y botón de ingreso.
  */
 export default function Lobby() {
   const iniciarDesdeLobby = useGameStore((s) => s.iniciarDesdeLobby)
@@ -18,62 +18,93 @@ export default function Lobby() {
       exit={{ opacity: 0 }}
     >
       <img
-        src={fondoLobby}
+        src={FONDO_LOBBY}
         alt="El Templo del Balance"
         className="lobby__fondo"
       />
 
-      <div className="lobby__ui">
-        <motion.header
-          className="lobby__titulo"
-          initial={{ opacity: 0, y: -18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12 }}
-        >
+      <motion.div
+        className="lobby__ui"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <header className="lobby__titulo">
           <p className="lobby__titulo-icono" aria-hidden="true">
             🐱
           </p>
           <h1 className="lobby__titulo-principal">Gatos Financieros</h1>
           <p className="lobby__titulo-sub">El Templo del Balance</p>
-        </motion.header>
+        </header>
 
-        <div className="lobby__escena">
+        <motion.div
+          className="lobby__escena"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22 }}
+        >
           <motion.div
             className="lobby__personaje lobby__personaje--fuego"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.22 }}
+            transition={{ delay: 0.28 }}
           >
-            <div className="lobby__pedestal" aria-label="Espacio para Fuego-Gato" />
-            <div className="lobby__control-hint lobby__control-hint--fuego">
+            <motion.img
+              src="/assets/Image/GatoFuegoQuieto.png"
+              alt=""
+              className="lobby__gato-sprite"
+              aria-hidden="true"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="lobby__control-hint lobby__control-hint--fuego"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 }}
+            >
               <span className="lobby__control-etiqueta">Fuego-Gato</span>
               <span className="lobby__control-teclas">
                 <kbd>←</kbd>
                 <kbd>→</kbd>
                 <kbd>↑</kbd>
+                <kbd>↓</kbd>
               </span>
-              <span className="lobby__control-nota">Mover · Saltar</span>
-            </div>
+              <span className="lobby__control-nota">Mover · Saltar · Ataque</span>
+            </motion.div>
           </motion.div>
 
           <motion.div
             className="lobby__personaje lobby__personaje--gota"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.28 }}
+            transition={{ delay: 0.34 }}
           >
-            <div className="lobby__pedestal" aria-label="Espacio para Gota-Gato" />
-            <div className="lobby__control-hint lobby__control-hint--gota">
+            <motion.img
+              src="/assets/Image/GatoAguaQuieto.png"
+              alt=""
+              className="lobby__gato-sprite"
+              aria-hidden="true"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+            />
+            <motion.div
+              className="lobby__control-hint lobby__control-hint--gota"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.34 }}
+            >
               <span className="lobby__control-etiqueta">Gota-Gato</span>
               <span className="lobby__control-teclas">
                 <kbd>A</kbd>
                 <kbd>D</kbd>
                 <kbd>W</kbd>
+                <kbd>S</kbd>
               </span>
-              <span className="lobby__control-nota">Mover · Saltar</span>
-            </div>
+              <span className="lobby__control-nota">Mover · Saltar · Ataque</span>
+            </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
 
         <motion.div
           className="lobby__acciones"
@@ -83,16 +114,16 @@ export default function Lobby() {
         >
           <motion.button
             type="button"
-            className="lobby-btn-ingreso"
+            className="lobby-btn-ingreso lobby-btn-ingreso--texto"
             aria-label="Entrar al templo"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.96 }}
             onClick={iniciarDesdeLobby}
           >
-            <img src={imgIngreso} alt="" className="lobby-btn-ingreso__img" />
+            Entrar al templo
           </motion.button>
         </motion.div>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }

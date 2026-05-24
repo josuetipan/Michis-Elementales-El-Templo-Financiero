@@ -1,6 +1,5 @@
 /**
  * Rutas de sprites por personaje y acción.
- * Nombres de archivo: GatoFuego* / GatoAgua* (gota = agua en assets).
  */
 export const ACCIONES_GATO = [
   'quieto',
@@ -27,12 +26,10 @@ export const SPRITES_POR_TIPO = {
   },
 }
 
-/** Alias único para Assets.load de Pixi */
 export function aliasTextura(tipo, accion) {
   return `gato_${tipo}_${accion}`
 }
 
-/** Lista plana { alias, src } para precarga */
 export function listarRecursosSprites() {
   const recursos = []
   for (const tipo of Object.keys(SPRITES_POR_TIPO)) {

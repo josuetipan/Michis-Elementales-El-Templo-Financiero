@@ -1,7 +1,6 @@
 import Matter from 'matter-js'
 import { estaEnSuelo } from '../game/physics.js'
 
-/** Controles por tipo de gato */
 const CONTROLES = {
   fuego: {
     izquierda: 'ArrowLeft',
@@ -12,18 +11,16 @@ const CONTROLES = {
     izquierda: 'KeyA',
     derecha: 'KeyD',
     salto: 'KeyW',
-    ataque: 'KeyS',
   },
 }
 
-/** Tecla de animación de ataque (lanzar fuego / chorro) */
 const ATAQUE = {
   fuego: 'ArrowDown',
   gota: 'KeyS',
 }
 
 /**
- * Gato jugador (Fuego o Gota) con cuerpo Matter.js y movimiento lateral + salto.
+ * Gato jugador (Fuego o Gota) con cuerpo Matter.js y animación por estado.
  */
 export class Cat {
   constructor(world, engine, { x, y, type, width = 36, height = 52 }) {
@@ -53,7 +50,6 @@ export class Cat {
     Matter.World.add(world, this.body)
   }
 
-  /** Aplica entrada del teclado en el mismo fotograma */
   aplicarEntrada(teclas) {
     const { body } = this
     const c = this.controles
@@ -78,9 +74,6 @@ export class Cat {
     this.actualizarAnimacion(teclas)
   }
 
-  /**
-   * Elige sprite según física y teclas (quieto, caminar, salto, aterrizaje, lanzar).
-   */
   actualizarAnimacion(teclas) {
     const vx = this.body.velocity.x
     const vy = this.body.velocity.y
@@ -96,8 +89,7 @@ export class Cat {
 
     if (!this.enSuelo) {
       this.estabaEnAire = true
-      if (vy < -0.2) this.estadoAnim = 'salto'
-      else this.estadoAnim = 'aterizaje'
+      this.estadoAnim = vy < -0.2 ? 'salto' : 'aterizaje'
       return
     }
 
@@ -112,11 +104,9 @@ export class Cat {
       return
     }
 
-    if (Math.abs(vx) > 0.25) this.estadoAnim = 'caminando'
-    else this.estadoAnim = 'quieto'
+    this.estadoAnim = Math.abs(vx) > 0.25 ? 'caminando' : 'quieto'
   }
 
-  /** Rectángulo para colisiones con monedas y hazards */
   getBounds() {
     const b = this.body.bounds
     return {
