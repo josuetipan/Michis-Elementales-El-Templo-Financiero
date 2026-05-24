@@ -38,9 +38,8 @@ export class GameLoop {
     this.pixi = new PixiLayer(pixiContainer)
     this.mundoAncho = 1280
     this.mundoAlto = 720
-    this.escala = 1
-    this.offsetX = 0
-    this.offsetY = 0
+    this.escalaX = 1
+    this.escalaY = 1
   }
 
   /** Muros invisibles para que nada salga del recuadro del nivel */
@@ -61,21 +60,18 @@ export class GameLoop {
     }
   }
 
-  /** Convierte coordenadas del mundo (1280×720) a pantalla */
+  /** Convierte coordenadas del mundo a pantalla (toda la ventana es el mapa) */
   mundoAPantalla(x, y) {
     return {
-      x: x * this.escala + this.offsetX,
-      y: y * this.escala + this.offsetY,
+      x: x * this.escalaX,
+      y: y * this.escalaY,
     }
   }
 
-  /** Escala el mapa entero para que quepa en una sola pantalla (sin scroll) */
+  /** El nivel ocupa el 100% del viewport, sin bandas ni recuadro interno */
   _calcularVista() {
-    const escalaX = this.anchoVista / this.mundoAncho
-    const escalaY = this.altoVista / this.mundoAlto
-    this.escala = Math.min(escalaX, escalaY)
-    this.offsetX = (this.anchoVista - this.mundoAncho * this.escala) / 2
-    this.offsetY = (this.altoVista - this.mundoAlto * this.escala) / 2
+    this.escalaX = this.anchoVista / this.mundoAncho
+    this.escalaY = this.altoVista / this.mundoAlto
   }
 
   async iniciar() {
@@ -206,7 +202,8 @@ export class GameLoop {
       estado: this.gatoFuego.estadoAnim,
       facing: this.gatoFuego.facing,
       tipo: 'fuego',
-      escala: this.escala,
+      escalaX: this.escalaX,
+      escalaY: this.escalaY,
     })
     this.pixi.actualizarGato('gota', {
       x: posG.x,
@@ -214,7 +211,8 @@ export class GameLoop {
       estado: this.gatoGota.estadoAnim,
       facing: this.gatoGota.facing,
       tipo: 'gota',
-      escala: this.escala,
+      escalaX: this.escalaX,
+      escalaY: this.escalaY,
     })
   }
 
@@ -275,28 +273,12 @@ export class GameLoop {
 
   renderizar() {
     const ctx = this.ctx
-    const { anchoVista, altoVista, mundoAncho, mundoAlto } = this
+    const { mundoAncho, mundoAlto } = this
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.fillStyle = '#1a0f2e'
-    ctx.fillRect(0, 0, anchoVista, altoVista)
-
-    ctx.setTransform(
-      this.escala,
-      0,
-      0,
-      this.escala,
-      this.offsetX,
-      this.offsetY,
-    )
+    ctx.setTransform(this.escalaX, 0, 0, this.escalaY, 0, 0)
 
     ctx.fillStyle = '#2d1b4e'
     ctx.fillRect(0, 0, mundoAncho, mundoAlto)
-
-    // Borde del recuadro de juego
-    ctx.strokeStyle = '#6b5b95'
-    ctx.lineWidth = 3
-    ctx.strokeRect(0, 0, mundoAncho, mundoAlto)
 
     for (const p of this.plataformas) p.dibujar(ctx)
     for (const h of this.hazards) h.dibujar(ctx)

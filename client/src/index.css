@@ -19,7 +19,7 @@ body,
   height: 100%;
   overflow: hidden;
   font-family: 'Outfit', system-ui, sans-serif;
-  background: var(--templo-oscuro);
+  background: var(--templo-medio);
   color: #f8f4ff;
 }
 
