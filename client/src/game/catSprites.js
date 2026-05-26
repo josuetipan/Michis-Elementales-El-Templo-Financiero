@@ -1,6 +1,9 @@
+import { assetUrl } from './assetUrls.js'
+
 /**
  * Rutas de sprites por personaje y acción (sin variantes *Capa*).
- */export const ACCIONES_GATO = [
+ */
+export const ACCIONES_GATO = [
   'quieto',
   'caminando',
   'salto',
@@ -10,18 +13,18 @@
 
 export const SPRITES_POR_TIPO = {
   fuego: {
-    quieto: '/assets/Image/GatoFuegoQuieto.png',
-    caminando: '/assets/Image/GatoFuegoCaminando.png',
-    salto: '/assets/Image/GatoFuegoSalto.png',
-    aterizaje: '/assets/Image/GatoFuegoAterizaje.png',
-    lanzando: '/assets/Image/GatoFuegoLanzandoFuego.png',
+    quieto: assetUrl('Image/GatoFuegoQuieto.png'),
+    caminando: assetUrl('Image/GatoFuegoCaminando.png'),
+    salto: assetUrl('Image/GatoFuegoSalto.png'),
+    aterizaje: assetUrl('Image/GatoFuegoAterizaje.png'),
+    lanzando: assetUrl('Image/GatoFuegoLanzandoFuego.png'),
   },
   gota: {
-    quieto: '/assets/Image/GatoAguaQuieto.png',
-    caminando: '/assets/Image/GatoAguaCaminando.png',
-    salto: '/assets/Image/GatoAguaSalto.png',
-    aterizaje: '/assets/Image/GatoAguaAterizaje.png',
-    lanzando: '/assets/Image/GatoAguaLanzandoChorro.png',
+    quieto: assetUrl('Image/GatoAguaQuieto.png'),
+    caminando: assetUrl('Image/GatoAguaCaminando.png'),
+    salto: assetUrl('Image/GatoAguaSalto.png'),
+    aterizaje: assetUrl('Image/GatoAguaAterizaje.png'),
+    lanzando: assetUrl('Image/GatoAguaLanzandoChorro.png'),
   },
 }
 

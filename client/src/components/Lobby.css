@@ -19,7 +19,7 @@
   pointer-events: none;
 }
 
-/* Columna flex: cabecera → escena → pie (sin solapamientos) */
+/* Columna: título → ingreso → gatos en plataforma */
 .lobby__ui {
   position: absolute;
   inset: 0;
@@ -27,27 +27,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
-  padding: clamp(0.85rem, 2.5vh, 1.75rem) clamp(0.75rem, 3vw, 1.5rem)
+  padding: clamp(2rem, 6.5vh, 4.25rem) clamp(0.75rem, 3vw, 1.5rem)
     clamp(1rem, 3vh, 2rem);
   box-sizing: border-box;
   pointer-events: none;
 }
 
-/* ── Cabecera: título, historia breve, contadores ── */
+/* ── Título ── */
 
 .lobby__cabecera {
   flex-shrink: 0;
   width: 100%;
-  max-width: 44rem;
   text-align: center;
   pointer-events: none;
-}
-
-.lobby__titulo-icono {
-  margin: 0 0 0.25rem;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
 }
 
 .lobby__titulo-principal {
@@ -68,81 +60,53 @@
     0 6px 14px rgba(0, 0, 0, 0.65);
 }
 
-.lobby__titulo-sub {
-  margin: 0.35rem 0 0;
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: clamp(0.72rem, 1.6vw, 0.95rem);
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255, 248, 235, 0.88);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
-}
+/* ── Botón ingreso (debajo del título, encima de gatos) ── */
 
-.lobby__historia {
-  margin: 0.5rem auto 0;
-  max-width: 36rem;
-  padding: 0 0.5rem;
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: clamp(0.68rem, 1.35vw, 0.82rem);
-  line-height: 1.45;
-  color: rgba(255, 248, 235, 0.78);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
-}
-
-.lobby__contadores {
+.lobby__entrada {
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: clamp(0.65rem, 2.5vw, 1.25rem);
-  margin-top: 0.65rem;
+  margin-top: clamp(0.5rem, 1.8vh, 1.1rem);
+  pointer-events: auto;
 }
 
-.lobby__contador {
-  min-width: 7.5rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: 0.55rem;
-  text-align: center;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+.lobby-btn-ingreso {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
+  transition: filter 0.2s ease;
 }
 
-.lobby__contador--fuego {
-  background: rgba(180, 60, 20, 0.38);
+.lobby-btn-ingreso:hover:not(:disabled) {
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.6)) brightness(1.08);
 }
 
-.lobby__contador--gota {
-  background: rgba(20, 80, 140, 0.38);
+.lobby-btn-ingreso:focus-visible {
+  outline: 3px solid #00b4d8;
+  outline-offset: 6px;
+  border-radius: 50%;
 }
 
-.lobby__contador-label {
+.lobby-btn-ingreso__img {
   display: block;
-  font-size: 0.62rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+  width: clamp(130px, 18vw, 185px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
-.lobby__contador-valor {
-  display: block;
-  margin-top: 0.15rem;
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
-  font-weight: 700;
-  color: #f4d58d;
-}
-
-/* ── Escena central: pedestales + gatos + controles ── */
+/* ── Gatos sobre la plataforma del fondo ── */
 
 .lobby__escena {
-  flex: 1;
+  flex-shrink: 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: clamp(2rem, 9vw, 6rem);
-  width: min(92vw, 760px);
-  min-height: 0;
-  margin: clamp(0.35rem, 1vh, 0.75rem) 0;
+  gap: clamp(2.25rem, 10vw, 7rem);
+  width: min(94vw, 780px);
+  margin-top: clamp(2rem, 6vh, 4.5rem);
   pointer-events: none;
 }
 
@@ -150,52 +114,46 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.45rem, 1.2vh, 0.75rem);
+  gap: clamp(0.4rem, 1vh, 0.65rem);
 }
 
-.lobby__pedestal-slot {
+/* Zona donde “pisan” la plataforma del arte de fondo */
+.lobby__plataforma-slot {
   position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-}
-
-.lobby__pedestal {
-  width: clamp(80px, 12vw, 120px);
-  height: clamp(96px, 14vh, 140px);
-  flex-shrink: 0;
+  width: clamp(100px, 14vw, 150px);
+  height: clamp(88px, 13vh, 120px);
 }
 
 .lobby__gato-sprite {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(72px, 11vw, 108px);
+  width: clamp(108px, 16vw, 158px);
   height: auto;
-  max-height: clamp(96px, 14vh, 132px);
+  max-height: clamp(120px, 17vh, 165px);
   object-fit: contain;
   object-position: bottom center;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
   pointer-events: none;
   user-select: none;
 }
 
+/* Etiquetas y controles debajo de cada gato */
 .lobby__control-hint {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-  min-width: clamp(100px, 13vw, 128px);
-  padding: 0.5rem 0.7rem 0.55rem;
+  min-width: clamp(108px, 14vw, 136px);
+  padding: 0.55rem 0.75rem 0.6rem;
   border-radius: 14px;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  background: rgba(18, 14, 10, 0.42);
-  border: 1px solid rgba(212, 175, 90, 0.45);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  background: rgba(18, 14, 10, 0.52);
+  border: 1px solid rgba(212, 175, 90, 0.5);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 6px 22px rgba(0, 0, 0, 0.38);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 24px rgba(0, 0, 0, 0.42);
 }
 
 .lobby__control-hint--fuego {
@@ -248,20 +206,9 @@
   color: rgba(255, 248, 235, 0.62);
 }
 
-/* ── Pie: banner de bono + botón ── */
-
-.lobby__pie {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.65rem;
-  width: 100%;
-  pointer-events: none;
-}
-
+/* Banner de bono (opcional) */
 .lobby__banner-bono {
-  margin: 0;
+  margin: clamp(0.5rem, 1.5vh, 1rem) 0 0;
   padding: 0.55rem 1.1rem;
   border-radius: 0.5rem;
   font-weight: 700;
@@ -284,98 +231,47 @@
   }
 }
 
-.lobby__acciones {
-  display: flex;
-  justify-content: center;
-  pointer-events: auto;
-}
-
-.lobby-btn-ingreso {
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
-  transition: filter 0.2s ease;
-}
-
-.lobby-btn-ingreso--texto {
-  padding: 0.7rem 1.85rem;
-  border-radius: 999px;
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: clamp(0.88rem, 2vw, 1rem);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #fff8eb;
-  background: linear-gradient(135deg, #c45c26, #e88a2e);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  filter: none;
-}
-
-.lobby-btn-ingreso--texto:hover {
-  filter: brightness(1.06);
-}
-
-.lobby-btn-ingreso--texto:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.lobby-btn-ingreso:focus-visible {
-  outline: 3px solid #00b4d8;
-  outline-offset: 4px;
-  border-radius: 999px;
-}
-
-.lobby-btn-ingreso__img {
-  display: block;
-  width: clamp(148px, 22vw, 220px);
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-}
-
 /* ── Responsive ── */
 
 @media (max-width: 560px) {
   .lobby__escena {
-    gap: clamp(1.25rem, 6vw, 2.5rem);
+    gap: clamp(1.5rem, 7vw, 2.75rem);
   }
 
   .lobby__titulo-principal {
     letter-spacing: 0.07em;
   }
-
-  .lobby__historia {
-    display: none;
-  }
 }
 
 @media (max-height: 640px) {
   .lobby__ui {
-    padding-top: 0.5rem;
-    padding-bottom: 0.75rem;
+    padding-top: clamp(1.25rem, 4vh, 2rem);
   }
 
-  .lobby__historia {
-    display: none;
-  }
-
-  .lobby__contadores {
+  .lobby__entrada {
     margin-top: 0.35rem;
   }
 
-  .lobby__pedestal {
-    height: clamp(72px, 11vh, 100px);
+  .lobby__escena {
+    margin-top: clamp(1.25rem, 4vh, 2.5rem);
+  }
+
+  .lobby__plataforma-slot {
+    height: clamp(72px, 11vh, 96px);
   }
 
   .lobby__gato-sprite {
-    max-height: clamp(80px, 11vh, 100px);
+    width: clamp(92px, 14vw, 120px);
+    max-height: clamp(100px, 14vh, 120px);
+  }
+
+  .lobby-btn-ingreso__img {
+    width: clamp(110px, 16vw, 145px);
   }
 }
 
 @media (min-aspect-ratio: 16/9) and (min-height: 700px) {
   .lobby__escena {
-    margin-top: 0.5rem;
+    margin-top: clamp(2.5rem, 7vh, 5rem);
   }
 }

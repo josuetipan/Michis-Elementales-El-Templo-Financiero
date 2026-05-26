@@ -1,49 +1,58 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSpring, animated } from '@react-spring/web'
 import { useGameStore } from '../store/gameStore.js'
 import { PEaje_ENTRADA_NIVEL_1 } from '../game/economiaNiveles.js'
 import { reproducir } from '../audio/sounds.js'
+import {
+  FONDO_LOBBY_URL,
+  GATO_FUEGO_CAPA,
+  GATO_FUEGO_QUIETO,
+  GATO_GOTA_CAPA,
+  GATO_GOTA_QUIETO,
+  INGRESO_URL,
+} from '../game/assetUrls.js'
+import ModalEntradaTemplo from './ModalEntradaTemplo.jsx'
 import './Lobby.css'
 
-const FONDO_LOBBY = '/assets/Image/lobby.png'
-
-function DineroAnimado({ valor, className }) {
-  const spring = useSpring({ number: valor, config: { tension: 120, friction: 14 } })
-  return (
-    <animated.span className={className}>
-      {spring.number.to((n) => `$${Math.round(n)}`)}
-    </animated.span>
-  )
-}
-
-const HISTORIA =
-  'Fuego-Gato (Inversión) y Gota-Gato (Ahorro) sueñan con las Súper Capas Doradas ($200). ' +
-  'Solo equilibrando riesgo y ahorro alcanzarán la meta.'
+const FONDO_LOBBY = FONDO_LOBBY_URL
 
 export default function Lobby() {
+  const [modalEntrada, setModalEntrada] = useState(false)
+
   const faseLobby = useGameStore((s) => s.faseLobby)
   const bolsaFuego = useGameStore((s) => s.bolsaFuego)
-  const cofreGota = useGameStore((s) => s.cofreGota)
   const mensajeLobby = useGameStore((s) => s.mensajeLobby)
   const capasDesbloqueadas = useGameStore((s) => s.capasDesbloqueadas)
   const iniciarAventura = useGameStore((s) => s.iniciarAventura)
   const pagarEntradaTemplo = useGameStore((s) => s.pagarEntradaTemplo)
 
-  const handleIniciar = () => {
+  const puedePagarAhora =
+    faseLobby === 'peaje' ? bolsaFuego >= PEaje_ENTRADA_NIVEL_1 : true
+
+  const bolsaMostrada =
+    faseLobby === 'peaje' ? bolsaFuego : PEaje_ENTRADA_NIVEL_1
+
+  const abrirModal = () => {
     reproducir('moneda')
-    iniciarAventura()
+    setModalEntrada(true)
   }
 
-  const handlePagar = () => {
-    if (pagarEntradaTemplo()) reproducir('peaje')
+  const cerrarModal = () => setModalEntrada(false)
+
+  const confirmarEntrada = () => {
+    if (faseLobby === 'intro') {
+      iniciarAventura()
+    }
+
+    const ok = useGameStore.getState().pagarEntradaTemplo()
+    if (ok) {
+      reproducir('peaje')
+      setModalEntrada(false)
+    }
   }
 
-  const spriteFuego = capasDesbloqueadas
-    ? '/assets/Image/GatoFuegoQuietoCapa.png'
-    : '/assets/Image/GatoFuegoQuieto.png'
-  const spriteGota = capasDesbloqueadas
-    ? '/assets/Image/GatoAguaQuietoCapa.png'
-    : '/assets/Image/GatoAguaQuieto.png'
+  const spriteFuego = capasDesbloqueadas ? GATO_FUEGO_CAPA : GATO_FUEGO_QUIETO
+  const spriteGota = capasDesbloqueadas ? GATO_GOTA_CAPA : GATO_GOTA_QUIETO
 
   return (
     <motion.div
@@ -61,38 +70,39 @@ export default function Lobby() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <p className="lobby__titulo-icono" aria-hidden="true">
-            🐱
-          </p>
-          <h1 className="lobby__titulo-principal">Gatos Financieros</h1>
-          <p className="lobby__titulo-sub">El Templo del Balance</p>
-          <p className="lobby__historia">{HISTORIA}</p>
-
-          <div className="lobby__contadores">
-            <div className="lobby__contador lobby__contador--fuego">
-              <span className="lobby__contador-label">Bolsa Inversión</span>
-              <DineroAnimado valor={bolsaFuego} className="lobby__contador-valor" />
-            </div>
-            <div className="lobby__contador lobby__contador--gota">
-              <span className="lobby__contador-label">Cofre Ahorro</span>
-              <DineroAnimado valor={cofreGota} className="lobby__contador-valor" />
-            </div>
-          </div>
+          <h1 className="lobby__titulo-principal">Templo Financiero</h1>
         </motion.header>
+
+        <motion.div
+          className="lobby__entrada"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 260, damping: 22 }}
+        >
+          <motion.button
+            type="button"
+            className="lobby-btn-ingreso"
+            aria-label="Entrar al templo"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={abrirModal}
+          >
+            <img src={INGRESO_URL} alt="" className="lobby-btn-ingreso__img" />
+          </motion.button>
+        </motion.div>
 
         <motion.div
           className="lobby__escena"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.28 }}
         >
           <div className="lobby__personaje lobby__personaje--fuego">
-            <div className="lobby__pedestal-slot">
-              <div className="lobby__pedestal" aria-hidden="true" />
+            <div className="lobby__plataforma-slot">
               <img src={spriteFuego} alt="" className="lobby__gato-sprite" />
             </div>
             <div className="lobby__control-hint lobby__control-hint--fuego">
-              <span className="lobby__control-etiqueta">Fuego-Gato</span>
+              <span className="lobby__control-etiqueta">Michi-Inversión</span>
               <span className="lobby__control-teclas">
                 <kbd>←</kbd>
                 <kbd>→</kbd>
@@ -103,12 +113,11 @@ export default function Lobby() {
           </div>
 
           <div className="lobby__personaje lobby__personaje--gota">
-            <div className="lobby__pedestal-slot">
-              <div className="lobby__pedestal" aria-hidden="true" />
+            <div className="lobby__plataforma-slot">
               <img src={spriteGota} alt="" className="lobby__gato-sprite" />
             </div>
             <div className="lobby__control-hint lobby__control-hint--gota">
-              <span className="lobby__control-etiqueta">Gota-Gato</span>
+              <span className="lobby__control-etiqueta">Michi-Ahorro</span>
               <span className="lobby__control-teclas">
                 <kbd>A</kbd>
                 <kbd>D</kbd>
@@ -119,51 +128,31 @@ export default function Lobby() {
           </div>
         </motion.div>
 
-        <div className="lobby__pie">
-          <AnimatePresence>
-            {mensajeLobby && (
-              <motion.p
-                className="lobby__banner-bono"
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {mensajeLobby}
-              </motion.p>
-            )}
-          </AnimatePresence>
-
-          <motion.div
-            className="lobby__acciones"
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.32, type: 'spring', stiffness: 240, damping: 20 }}
-          >
-            {faseLobby === 'intro' ? (
-              <motion.button
-                type="button"
-                className="lobby-btn-ingreso lobby-btn-ingreso--texto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={handleIniciar}
-              >
-                Iniciar Aventura
-              </motion.button>
-            ) : (
-              <motion.button
-                type="button"
-                className="lobby-btn-ingreso lobby-btn-ingreso--texto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={handlePagar}
-                disabled={bolsaFuego < PEaje_ENTRADA_NIVEL_1}
-              >
-                Pagar Entrada (${PEaje_ENTRADA_NIVEL_1})
-              </motion.button>
-            )}
-          </motion.div>
-        </div>
+        <AnimatePresence>
+          {mensajeLobby && !modalEntrada && (
+            <motion.p
+              className="lobby__banner-bono"
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {mensajeLobby}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {modalEntrada && (
+          <ModalEntradaTemplo
+            peaje={PEaje_ENTRADA_NIVEL_1}
+            bolsaFuego={bolsaMostrada}
+            puedePagar={puedePagarAhora}
+            onConfirmar={confirmarEntrada}
+            onCerrar={cerrarModal}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

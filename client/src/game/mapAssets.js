@@ -1,5 +1,6 @@
-/** Fondo del templo para los niveles jugables */
-export const FONDO_MAPA_URL = '/assets/Image/FondoMapa.png'
+import { FONDO_MAPA_URL } from './assetUrls.js'
+
+export { FONDO_MAPA_URL }
 
 export function cargarImagen(src) {
   return new Promise((resolve) => {

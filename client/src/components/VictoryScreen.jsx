@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useGameStore } from '../store/gameStore.js'
 import { reproducir } from '../audio/sounds.js'
+import { GATO_FUEGO_CAPA, GATO_GOTA_CAPA } from '../game/assetUrls.js'
 
 const MENSAJE_FINAL =
   '¡Felicidades, Maestro del Balance! El capital de Fuego trabaja duro para abrir caminos; ' +
@@ -37,12 +38,12 @@ export default function VictoryScreen() {
 
       <div className="mt-8 flex gap-8">
         <img
-          src="/assets/Image/GatoFuegoQuietoCapa.png"
+          src={GATO_FUEGO_CAPA}
           alt="Fuego con Súper Capa"
           className="h-32 w-auto drop-shadow-lg md:h-40"
         />
         <img
-          src="/assets/Image/GatoAguaQuietoCapa.png"
+          src={GATO_GOTA_CAPA}
           alt="Gota con Súper Capa"
           className="h-32 w-auto drop-shadow-lg md:h-40"
         />
