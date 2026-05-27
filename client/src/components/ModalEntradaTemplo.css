@@ -13,8 +13,8 @@
 
 .modal-entrada__panel {
   position: relative;
-  width: min(92vw, 520px);
-  min-height: clamp(220px, 38vh, 320px);
+  width: min(92vw, 540px);
+  min-height: clamp(250px, 44vh, 360px);
   filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
 }
 
@@ -28,18 +28,29 @@
   user-select: none;
 }
 
+/* Tres zonas: título arriba · texto centro · botones abajo */
 .modal-entrada__contenido {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  min-height: clamp(220px, 38vh, 320px);
-  padding: clamp(1.75rem, 4vh, 2.5rem) clamp(1.5rem, 5vw, 2.75rem)
-    clamp(1.25rem, 3vh, 1.75rem);
+  justify-content: space-between;
+  min-height: clamp(250px, 44vh, 360px);
+  padding:
+    clamp(2.4rem, 6.5vh, 3.4rem)
+    clamp(2.1rem, 6vw, 3.2rem)
+    clamp(2.1rem, 5vh, 2.9rem);
+  box-sizing: border-box;
   text-align: center;
+}
+
+.modal-entrada__cabecera {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: clamp(0.35rem, 1.2vh, 0.75rem);
 }
 
 .modal-entrada__titulo {
@@ -51,6 +62,18 @@
   text-transform: uppercase;
   color: #5c3d12;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.modal-entrada__cuerpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 24rem;
+  padding: clamp(0.35rem, 1vh, 0.75rem) 0;
 }
 
 .modal-entrada__texto {
@@ -74,7 +97,7 @@
 }
 
 .modal-entrada__saldo {
-  margin: 0.15rem 0 0;
+  margin: 0;
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: clamp(0.78rem, 1.6vw, 0.9rem);
   color: #4a3418;
@@ -87,7 +110,7 @@
 }
 
 .modal-entrada__aviso {
-  margin: 0;
+  margin: 0.15rem 0 0;
   padding: 0.4rem 0.65rem;
   border-radius: 8px;
   font-size: 0.72rem;
@@ -98,49 +121,55 @@
 }
 
 .modal-entrada__acciones {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(0.85rem, 3vw, 1.35rem);
-  margin-top: 0.35rem;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 21rem;
+  gap: clamp(0.75rem, 3vw, 1.25rem);
+  padding-bottom: clamp(0.15rem, 0.6vh, 0.35rem);
 }
 
 .modal-entrada__btn {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: clamp(52px, 8vh, 66px);
   padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
-  transition: filter 0.2s ease, opacity 0.2s ease;
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.4));
+  transition: filter 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
 .modal-entrada__btn img {
   display: block;
-  height: auto;
+  width: 100%;
+  max-width: clamp(112px, 19vw, 148px);
+  height: clamp(52px, 8vh, 66px);
+  object-fit: contain;
+  object-position: center;
   pointer-events: none;
   user-select: none;
 }
 
 .modal-entrada__btn--flecha img {
-  width: clamp(120px, 22vw, 168px);
+  object-position: center right;
 }
 
-.modal-entrada__btn--casa img {
-  width: clamp(44px, 8vw, 56px);
-}
-
-.modal-entrada__btn--flecha:hover:not(:disabled) {
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45)) brightness(1.07);
+.modal-entrada__btn--flecha:hover:not(:disabled),
+.modal-entrada__btn--casa:hover {
+  filter: drop-shadow(0 7px 16px rgba(0, 0, 0, 0.48)) brightness(1.08);
 }
 
 .modal-entrada__btn--flecha:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   filter: grayscale(0.4);
-}
-
-.modal-entrada__btn--casa:hover {
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45)) brightness(1.1);
 }
 
 .modal-entrada__btn:focus-visible {
@@ -150,8 +179,32 @@
 }
 
 @media (max-width: 480px) {
+  .modal-entrada__contenido {
+    padding:
+      clamp(2rem, 5.5vh, 2.75rem)
+      clamp(1.5rem, 5vw, 2rem)
+      clamp(1.75rem, 4.5vh, 2.35rem);
+  }
+
   .modal-entrada__acciones {
-    flex-direction: column-reverse;
+    max-width: 100%;
     gap: 0.65rem;
+  }
+
+  .modal-entrada__btn img {
+    max-width: clamp(96px, 40vw, 128px);
+    height: clamp(48px, 7vh, 58px);
+  }
+}
+
+@media (max-height: 620px) {
+  .modal-entrada__panel,
+  .modal-entrada__contenido {
+    min-height: clamp(220px, 50vh, 300px);
+  }
+
+  .modal-entrada__contenido {
+    padding-top: clamp(1.85rem, 5vh, 2.5rem);
+    padding-bottom: clamp(1.65rem, 4vh, 2.25rem);
   }
 }

@@ -39,51 +39,55 @@ export default function ModalEntradaTemplo({
         <img src={CUADRO_MODAL_URL} alt="" className="modal-entrada__marco" aria-hidden="true" />
 
         <div className="modal-entrada__contenido">
-          <h2 id="modal-entrada-titulo" className="modal-entrada__titulo">
-            Puerta del Templo
-          </h2>
+          <div className="modal-entrada__cabecera">
+            <h2 id="modal-entrada-titulo" className="modal-entrada__titulo">
+              Puerta del Templo
+            </h2>
+          </div>
 
-          <p className="modal-entrada__texto">
-            Para ingresar al <strong>primer mapa</strong> debes pagar{' '}
-            <span className="modal-entrada__precio">${peaje}</span>.
-            {bolsaFuego >= peaje
-              ? ' Se descontará de la bolsa de Michi-Inversión.'
-              : ' Recibirás el bono de bienvenida al confirmar.'}
-          </p>
-
-          <p className="modal-entrada__saldo">
-            Tu bolsa: <span>${bolsaFuego}</span>
-          </p>
-
-          {!puedePagar && (
-            <p className="modal-entrada__aviso">
-              Necesitas al menos ${peaje}. Inicia la aventura para recibir el bono de
-              bienvenida.
+          <div className="modal-entrada__cuerpo">
+            <p className="modal-entrada__texto">
+              Para ingresar al <strong>primer mapa</strong> debes pagar{' '}
+              <span className="modal-entrada__precio">${peaje}</span>.
+              {bolsaFuego >= peaje
+                ? ' Se descontará de la bolsa de Michi-Inversión.'
+                : ' Recibirás el bono de bienvenida al confirmar.'}
             </p>
-          )}
+
+            <p className="modal-entrada__saldo">
+              Tu bolsa: <span>${bolsaFuego}</span>
+            </p>
+
+            {!puedePagar && (
+              <p className="modal-entrada__aviso">
+                Necesitas al menos ${peaje}. Inicia la aventura para recibir el bono de
+                bienvenida.
+              </p>
+            )}
+          </div>
 
           <div className="modal-entrada__acciones">
             <motion.button
               type="button"
+              className="modal-entrada__btn modal-entrada__btn--casa"
+              aria-label="Cerrar y volver al lobby"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
+              onClick={onCerrar}
+            >
+              <img src={CASA_BTN_URL} alt="" />
+            </motion.button>
+
+            <motion.button
+              type="button"
               className="modal-entrada__btn modal-entrada__btn--flecha"
               aria-label="Pagar e ingresar al primer mapa"
-              whileHover={{ scale: puedePagar ? 1.06 : 1 }}
+              whileHover={{ scale: puedePagar ? 1.05 : 1 }}
               whileTap={{ scale: puedePagar ? 0.94 : 1 }}
               onClick={onConfirmar}
               disabled={!puedePagar}
             >
               <img src={FLECHA_BTN_URL} alt="" />
-            </motion.button>
-
-            <motion.button
-              type="button"
-              className="modal-entrada__btn modal-entrada__btn--casa"
-              aria-label="Cerrar y volver al lobby"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={onCerrar}
-            >
-              <img src={CASA_BTN_URL} alt="" />
             </motion.button>
           </div>
         </div>
